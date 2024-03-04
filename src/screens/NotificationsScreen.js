@@ -1,51 +1,39 @@
-import React from 'react';
-import { SafeAreaView, ScrollView, Text, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { FlatList, StyleSheet, View, StyleSheet, SafeAreaView } from 'react-native';
+import Constants from "expo-constants";
+import Items from '../components/Item/Items';
+import TaskContext from "../context/TaskContext";
 
 function NotificationsScreen() {
+
+  const { itemList } = useContext(TaskContext);
+
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView style={[styles.policyContainer, styles.screenBackground]} contentContainerStyle={{ paddingBottom: 30 }}>
-          <Text style={styles.screenTitle}>Notifications:</Text>
-          
-        </ScrollView>
+
+      <SafeAreaView style={styles.screen}>
+        <View>
+          <FlatList
+            data={itemList}
+            keyExtractor={(itemList) => itemList.id}
+            renderItem={({ item }) => (
+              <Items
+                description={item.data.description}
+                date={item.data.date}
+                images={item.data.images}
+              />
+            )}
+          />
+        </View>
       </SafeAreaView>
+    
     );
+  
   }
   
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  policyContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: 'transparent',
-    paddingBottom: 30,
-  },
-  screenBackground: {
-    backgroundColor: '#F7E7F8',
-  },
-  screenTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'hsl(270, 50%, 60%)',
-    marginBottom: 10,
-    marginTop: -7,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: 'hsl(270, 50%, 60%)'
-  },
-  notificationText: {
-    fontSize: 14,
-    marginBottom: 5,
-    color: 'hsl(270, 50%, 60%)'
-  },
-
-});
-
-export default NotificationsScreen;
+  const styles = StyleSheet.create({
+    screen: {
+      paddingTop: Constants.StatusBarHeight,
+      backgroundColor: "#F7E7F8",
+    },
+    
+  });

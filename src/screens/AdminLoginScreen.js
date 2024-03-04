@@ -1,19 +1,37 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { AuthContext } from '../context/AuthContext';
 
 const AdminLoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { signIn } = useContext(AuthContext);
 
-  const handleLogin = () => {
-    if (username === 'kay' && password === 'Password1018!') {
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://<your-backend-url>/admin/login', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+          throw new Error('Login failed');
+      }
+
+      const { token } = await response.json();
+      await signIn(token); // Use signIn from AuthContext
       navigation.navigate('AdminScreen');
-    } else {
+    } catch (error) {
       setError('Incorrect username or password');
       setTimeout(() => setError(''), 5000);
     }
   };
+  
+
 
   return (
 

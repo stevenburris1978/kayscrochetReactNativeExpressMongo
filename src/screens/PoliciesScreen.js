@@ -9,19 +9,21 @@ const PoliciesScreen = () => {
             <Text style={styles.screenTitle}>POLICY:</Text>
             <Text style={styles.header}>Effective Date: 2023</Text>
         <Text style={styles.text}>
-          Welcome to Kay's Crochet. This section outlines all Kay's Crochet policies, including our Privacy Policy and additional terms related to sales, shipping, and returns. By using Kay's Crochet app, you agree to these terms.
+          Welcome to Kay's Crochet. This section outlines all Kay's Crochet policies, including the Privacy Policy and additional terms related to sales, shipping, and returns. By using Kay's Crochet app, you agree to these terms.
+        </Text>
+        <Text style={styles.text}>
+        See beautiful crocheted items for sale at Kay's Crochet. Handmade by Kay with love and care.
         </Text>
         <Text style={styles.subHeader}>Privacy Policy:</Text>
 
         {/* Information Collection and Use */}
         <Text style={styles.subHeader}>1. Information Collection and Use</Text>
         <Text style={styles.text}>
-          <Text style={styles.strong}>Personal Information Collected:</Text> Email address, mailing address, and other necessary information for transactions and delivery of products.
+          <Text style={styles.strong}>Personal Information Collected:</Text> Email address, mailing address, and full name for transactions and delivery of products.
         </Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Purpose:</Text> To process transactions and deliver products purchased through Kay's Crochet.
         </Text>
-
                     {/* Data Sharing */}
         <Text style={styles.subHeader}>2. Data Security</Text>
         <Text style={styles.text}>
@@ -56,16 +58,9 @@ const PoliciesScreen = () => {
         <Text style={styles.subHeader}>7. Under 13 Privacy</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Under 13 Policy: </Text>
-              Kay's Crochet does not knowingly collect personal information 
-              from anyone under the age of 13. Users under 13 must have consent from a parent or guardian 
-              to make purchases on Kay's Crochet or to register. Parents or guardians 
-              can get instructions to provide consent by sending an email 
-              to kayscrochetus@gmail.com. If it is discovered that a user in this age group has 
-              made purchases or registered without parental consent, their user information 
-              will be deleted. Parents or guardians who wish to inquire about or request the deletion of 
-              personal information can send an email to kayscrochetus@gmail.com.
+          Kay's Crochet is not directed at or meant for the use of children under the age of 13. We do not knowingly collect or keep personal information of children under the age of 13.
           
-        </Text>
+          </Text>
 
               {/* No Use of Cookies */}
         <Text style={styles.subHeader}>8. No Use of Cookies</Text>
@@ -99,7 +94,7 @@ const PoliciesScreen = () => {
               {/* Personal Information Usage */}
         <Text style={styles.subHeader}>12. Personal Information Usage</Text>
         <Text style={styles.text}>
-          <Text style={styles.strong}>Purpose:</Text> We do not ever share any personal information.
+          <Text style={styles.strong}>Purpose:</Text> Kay's Crochet does not ever share any personal information.
         </Text>
 
         <Text style={styles.text}>

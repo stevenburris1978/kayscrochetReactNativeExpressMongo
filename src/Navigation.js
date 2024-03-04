@@ -14,9 +14,14 @@ import CustomDrawerContent from './components/CustomDrawerContent';
 import CustomHeader from './components/CustomHeader';
 import CustomScreenHeader from './components/CustomScreenHeader';
 
+import { useAuth } from './context/AuthContext';
+
 const Drawer = createDrawerNavigator();
 
 const Navigation = () => {
+
+const { isAuthenticated } = useAuth();
+
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -84,17 +89,19 @@ const Navigation = () => {
           },
         }}
       />
-      <Drawer.Screen 
-        name="AdminScreen" 
-        component={AdminScreen} 
-        options={{ 
-          headerTitle: () => <CustomScreenHeader title="Kay's Crochet" showBack={true} />,
-          drawerItemStyle: { height: 0 },
-          headerStyle: {
-            backgroundColor: '#F7E7F8',
-          },
-        }}
-      />
+      {isAuthenticated && (
+        <Drawer.Screen 
+          name="AdminScreen" 
+          component={AdminScreen} 
+          options={{ 
+            headerTitle: () => <CustomScreenHeader title="Kay's Crochet" showBack={true} />,
+            drawerItemStyle: { height: 0 },
+            headerStyle: {
+              backgroundColor: '#F7E7F8',
+            },
+          }}
+        />
+      )}
       <Drawer.Screen 
         name="Notifications" 
         component={NotificationsScreen}
