@@ -10,10 +10,13 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
 const PushToken = require('./models/pushToken');
+const cors = require('cors');
 
 require('dotenv').config();
 
 const app = express();
+
+app.use(cors());
 
 const admin = require('firebase-admin');
 const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
