@@ -77,7 +77,7 @@ const limiter = rateLimit({
 aws.config.update({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  region: 'your-region'
+  region: 'us-east-1'
 });
 
 const s3 = new aws.S3();
@@ -85,7 +85,7 @@ const s3 = new aws.S3();
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'your-bucket-name',
+    bucket: 'kayscrochetmobilebucket',
     acl: 'public-read',
     key: function (req, file, cb) {
       cb(null, Date.now().toString())
@@ -152,7 +152,7 @@ router.post('/items', async (req, res) => {
 
   try {
     const savedItem = await newItem.save();
-    sendPushNotification(savedItem); // Call the function to send a notification
+    sendPushNotification(savedItem); 
     res.status(201).json(savedItem);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -171,6 +171,23 @@ router.delete('/items/:id', async (req, res) => {
   }
 });
 
+// Route for saving push tokens
+app.post('/save-push-token', async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    let pushToken = await PushToken.findOne({ token });
+    if (!pushToken) {
+      pushToken = new PushToken({ token });
+      await pushToken.save();
+    }
+    res.status(200).send('Token saved.');
+  } catch (error) {
+    console.error('Error saving token:', error);
+    res.status(500).send('Error saving token.');
+  }
+});
+
 // update an item
 router.put('/items/:id', async (req, res) => {
   try {
@@ -180,7 +197,6 @@ router.put('/items/:id', async (req, res) => {
     // Update fields
     item.description = req.body.description || item.description;
     item.date = req.body.date || item.date;
-    // update other fields as necessary
 
     const updatedItem = await item.save();
     res.json(updatedItem);
@@ -189,7 +205,6 @@ router.put('/items/:id', async (req, res) => {
   }
 });
   
-  // Use the router in your app
   app.use(router);
 
 const PORT = process.env.PORT;

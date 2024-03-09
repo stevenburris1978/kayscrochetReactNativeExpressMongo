@@ -1,0 +1,14 @@
+# Dependency directory
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Directory for storing persistent data
+data/
+
+#admin user hash creator file
+createAdmin.js
