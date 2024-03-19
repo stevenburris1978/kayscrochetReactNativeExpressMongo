@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const Item = require('./models/item');
 const router = express.Router();
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
@@ -72,11 +71,6 @@ const verifyToken = (req, res, next) => {
     });
 };
 
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, 
-    max: 100 
-  });
-
 aws.config.update({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -95,8 +89,6 @@ const upload = multer({
     }
   })
 });
-  
-app.use(limiter);
 
 app.use(helmet());
 
@@ -136,7 +128,7 @@ app.post('/upload-images', upload.array('images', 10), (req, res) => {
 });
 
 // GET all items
-router.get('/items', async (req, res) => {
+app.get('/items', async (req, res) => {
     try {
       const items = await Item.find({});
       res.json(items);
@@ -146,7 +138,7 @@ router.get('/items', async (req, res) => {
   });
   
 // POST a new item
-router.post('/items', async (req, res) => {
+app.post('/items', async (req, res) => {
   const newItem = new Item({
     description: req.body.description,
     date: req.body.date,
@@ -163,7 +155,7 @@ router.post('/items', async (req, res) => {
 });
 
 // DELETE an item
-router.delete('/items/:id', async (req, res) => {
+app.delete('/items/:id', async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
     if (!item) return res.status(404).json({ message: 'Item not found' });
@@ -192,7 +184,7 @@ app.post('/save-push-token', async (req, res) => {
 });
 
 // update an item
-router.put('/items/:id', async (req, res) => {
+app.put('/items/:id', async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
     if (!item) return res.status(404).json({ message: 'Item not found' });
@@ -207,8 +199,6 @@ router.put('/items/:id', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-  
-  app.use(router);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
