@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { FlatList, StyleSheet, View, StyleSheet, SafeAreaView } from 'react-native';
+import { FlatList, StyleSheet, View, SafeAreaView } from 'react-native';
 import Constants from "expo-constants";
 import Items from '../components/Item/Items';
 import TaskContext from "../context/TaskContext";
@@ -37,3 +37,5 @@ function NotificationsScreen() {
     },
     
   });
+
+  export default NotificationsScreen;

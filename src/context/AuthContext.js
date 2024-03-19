@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext(null);
@@ -6,6 +6,23 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userToken, setUserToken] = useState(null);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const token = await AsyncStorage.getItem('userToken');
+        if (token) {
+          setUserToken(token);
+          setIsAuthenticated(true);
+        }
+      } catch (e) {
+        console.error('Failed to fetch token', e);
+      }
+    };
+  
+    initializeAuth();
+  }, []);
+  
 
   const signIn = async (token) => {
     try {
@@ -26,6 +43,9 @@ export const AuthProvider = ({ children }) => {
       console.error('Removing token failed', e);
     }
   };
+
+  console.log({ isAuthenticated, userToken, signIn, logout });
+
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, userToken, signIn, logout }}>

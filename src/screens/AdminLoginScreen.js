@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 
@@ -6,11 +6,14 @@ const AdminLoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { signIn } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  console.log('AuthContext:', authContext); 
+  const { signIn } = authContext;
+  console.log('signIn function:', signIn);
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://<your-backend-url>/admin/login', {
+      const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/admin/login', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -23,11 +26,11 @@ const AdminLoginScreen = ({ navigation }) => {
       }
 
       const { token } = await response.json();
-      await signIn(token); // Use signIn from AuthContext
+      await signIn(token); 
       navigation.navigate('AdminScreen');
     } catch (error) {
       setError('Incorrect username or password');
-      setTimeout(() => setError(''), 5000);
+      setTimeout(() => setError(''), 3000);
     }
   };
   

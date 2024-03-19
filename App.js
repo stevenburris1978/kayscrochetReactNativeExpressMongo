@@ -1,15 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Dimensions } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { NavigationContainer } from '@react-navigation/native';
 import Navigation from './src/Navigation';
-import { AuthProvider } from './context/AuthContext'; 
+import { AuthProvider } from './src/context/AuthContext'; 
+import { TaskProvider } from './src/context/TaskContext';
+
+// Define isPortrait for orientation
+const isPortrait = () => {
+  const dim = Dimensions.get('screen');
+  return dim.height >= dim.width;
+};
 
 const App = () => {
 
+  const [orientation, setOrientation] = useState(isPortrait() ? 'portrait' : 'landscape');
+
   useEffect(() => {
+
     registerForPushNotificationsAsync();
     setupNotificationListeners();
+
+    const subscription = Dimensions.addEventListener('change', () => {
+      setOrientation(isPortrait() ? 'portrait' : 'landscape');
+    });
+
+    return () => {
+      if (subscription) {
+        subscription.remove();
+      }
+    };
+
   }, []);
+
+  const handleOrientationChange = () => {
+    setOrientation(isPortrait() ? 'portrait' : 'landscape');
+  };
 
   const registerForPushNotificationsAsync = async () => {
     let token;
@@ -22,7 +48,6 @@ const App = () => {
       token = (await Notifications.getExpoPushTokenAsync()).data;
       console.log(token);
 
-      // Send the token to your backend for storage
       sendPushTokenToBackend(token);
     } else {
       console.log('Must use physical device for Push Notifications');
@@ -32,7 +57,7 @@ const App = () => {
   };
 
   const sendPushTokenToBackend = async (token) => {
-    const response = await fetch('http://<your-backend-url>/save-push-token', {
+    const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/save-push-token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,9 +87,11 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <NavigationContainer>
-        <Navigation />
-      </NavigationContainer>
+      <TaskProvider>
+        <NavigationContainer>
+          <Navigation />
+        </NavigationContainer>
+      </TaskProvider>
     </AuthProvider>
   );
 };

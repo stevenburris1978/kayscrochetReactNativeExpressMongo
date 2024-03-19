@@ -35,7 +35,7 @@ export default function AddItem() {
     try {
       let imageUrls = [];
       if (images.length > 0) {
-        const response = await fetch('<your-backend-url>/upload-images', {
+        const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/upload-images', {
           method: 'POST',
           body: formData,
           headers: {
@@ -129,7 +129,7 @@ export default function AddItem() {
 
           <TouchableOpacity 
             style={styles.button} 
-            onPress={handelSubmit}>
+            onPress={handleSubmit}>
             <Text style={styles.buttonText}>Add Item</Text>
           </TouchableOpacity>
 

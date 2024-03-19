@@ -12,7 +12,6 @@ export default function Items({
   return (
     <Swipeable renderRightActions={renderRightActions}>
 
-        <>
           <View style={styles.mainContainer}>       
             <Text style={styles.description}>Description: {description}</Text>
             {images && images.map((img, index) => (
@@ -23,8 +22,7 @@ export default function Items({
                 <MaterialCommunityIcons name="gesture-swipe-left" size={30} color="hsl(270, 50%, 60%)" />
             </View>
           </View>
-        </>
-
+        
     </Swipeable>
   );
 }

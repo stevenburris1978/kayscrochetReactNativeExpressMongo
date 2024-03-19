@@ -13,7 +13,7 @@ export const TaskProvider = ({ children }) => {
   // Fetch items from the backend
   const fetchItems = async () => {
     try {
-      const response = await fetch('<your-backend-url>/items');
+      const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items');
       const data = await response.json();
       if (response.ok) {
         setItemList(data);
@@ -33,7 +33,7 @@ export const TaskProvider = ({ children }) => {
   // Add Item
   const addItem = async (newItem) => {
     try {
-      const response = await fetch('<your-backend-url>/items', {
+      const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export const TaskProvider = ({ children }) => {
           text: "Delete",
           onPress: async () => {
             try {
-              const response = await fetch(`<your-backend-url>/items/${id}`, {
+              const response = await fetch(`https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items/${id}`, {
                 method: 'DELETE',
               });
               if (response.ok) {
@@ -91,7 +91,7 @@ export const TaskProvider = ({ children }) => {
   // Update Item
   const updateItem = async (id, updItem) => {
     try {
-      const response = await fetch(`<your-backend-url>/items/${id}`, {
+      const response = await fetch(`https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

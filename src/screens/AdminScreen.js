@@ -1,10 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FlatList, Modal, StyleSheet, View, TextInput, TouchableOpacity, TouchableWithoutFeedback, Text, StyleSheet, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { FlatList, Modal, StyleSheet, View, TextInput, TouchableOpacity, TouchableWithoutFeedback, Text, Alert, SafeAreaView } from 'react-native';
 import AddItem from '../components/Item/AddItem';
 import Constants from "expo-constants";
 import Items from '../components/Item/Items';
 import TaskContext from "../context/TaskContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AuthContext } from '../context/AuthContext';
 
 const AdminScreen = () => {
 
@@ -12,6 +13,7 @@ const AdminScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [description, setDescription] = useState("");
   const [itemId, setItemId] = useState(null);
+  const { userToken } = useContext(AuthContext);
 
   const handleEditItem = (item) => {
     setItemId(item.id);
@@ -30,9 +32,9 @@ const AdminScreen = () => {
   // Function to check if the admin is authenticated
   const checkAdminAuth = async () => {
     try {
-      const response = await fetch('http://<your-backend-url>/admin/check-auth', {
+      const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/admin/check-auth', {
         headers: {
-          'Authorization': `Bearer ${yourToken}`, // Replace 'yourToken' with the actual token stored somewhere in your app
+          'Authorization': `Bearer ${userToken}`,
         },
       });
 
@@ -201,3 +203,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export default AdminScreen;

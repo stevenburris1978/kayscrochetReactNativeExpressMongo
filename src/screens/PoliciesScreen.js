@@ -12,7 +12,7 @@ const PoliciesScreen = () => {
           Welcome to Kay's Crochet. This section outlines all Kay's Crochet policies, including the Privacy Policy and additional terms related to sales, shipping, and returns. By using Kay's Crochet app, you agree to these terms.
         </Text>
         <Text style={styles.text}>
-        See beautiful crocheted items for sale at Kay's Crochet. Handmade by Kay with love and care.
+        See beautiful crocheted items for sale at www.kayscrochet.us  Handmade by Kay with love and care.
         </Text>
         <Text style={styles.subHeader}>Privacy Policy:</Text>
 
@@ -27,7 +27,7 @@ const PoliciesScreen = () => {
                     {/* Data Sharing */}
         <Text style={styles.subHeader}>2. Data Security</Text>
         <Text style={styles.text}>
-          <Text style={styles.strong}>Measures:</Text> Implementing authentication security measures to protect against unauthorized access, alteration, disclosure, or destruction of personal information.
+          <Text style={styles.strong}>Measures:</Text> Kay's Crochet secures payments with Stripe (www.stripe.com) and secures user credentials with Django authentication.
         </Text>
 
                     {/* Changes to Privacy Policy */}

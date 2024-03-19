@@ -3,7 +3,7 @@
     "name": "Kay's Crochet",
     "slug": "kayscrochet",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -21,10 +21,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFC5CF"
-      }
+      },
+      "package": "com.stevenburris1978.kayscrochet"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "30cd4006-9bc8-403d-a7d6-bbfef44d5ea1"
+      }
+    },
+    "owner": "stevenburris1978"
   }
 }
