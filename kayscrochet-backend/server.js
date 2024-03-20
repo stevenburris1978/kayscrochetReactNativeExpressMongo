@@ -7,7 +7,6 @@ const helmet = require('helmet');
 const aws = require('aws-sdk');
 const PushToken = require('./models/pushToken');
 const cors = require('cors');
-const ImagePicker = require('expo-image-picker').ImagePicker;
 const Expo = require('expo-server-sdk').Expo
 
 require('dotenv').config();
