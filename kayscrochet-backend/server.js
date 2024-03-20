@@ -134,13 +134,22 @@ app.get('/admin/check-auth', verifyToken, (req, res) => {
 });
 
 // Route to handle image upload
-app.post('/upload-images', async (req, res) => {
+app.post('/api/upload', async (req, res) => {
   try {
-    const { base64 } = req.body;
-    const imageData = base64.split(';base64,').pop();
-    const imageBuffer = Buffer.from(imageData, 'base64');
-    const imageUrl = await uploadToS3(imageBuffer);
-    res.json({ imageUrl });
+    const base64Data = Buffer.from(req.body.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+    const imageKey = `${Date.now()}.jpg`;
+
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: imageKey,
+      Body: base64Data,
+      ContentType: 'image/jpeg',
+      ContentEncoding: 'base64',
+      ACL: 'public-read',
+    };
+
+    const uploadResult = await s3.upload(params).promise();
+    res.json({ Location: uploadResult.Location });
   } catch (error) {
     console.error('Error uploading image:', error);
     res.status(500).json({ message: 'Failed to upload image' });
