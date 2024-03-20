@@ -3,13 +3,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Item = require('./models/item');
-const router = express.Router();
 const helmet = require('helmet');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
 const PushToken = require('./models/pushToken');
 const cors = require('cors');
+const { Expo } = require('expo-server-sdk');
+const { ImagePicker } = require('expo-image-picker');
 
 require('dotenv').config();
 
@@ -26,25 +25,32 @@ admin.initializeApp({
 
 const sendPushNotification = async (itemData) => {
   const tokens = await PushToken.find({});
+  const expo = new Expo();
   const messages = tokens.map(pushToken => {
+    if (!Expo.isExpoPushToken(pushToken.token)) {
+      console.error(`Push token ${pushToken.token} is not a valid Expo push token`);
+      return null;
+    }
     return {
-      token: pushToken.token,
-      notification: {
-        title: "Kay's Crochet Has New Items!",
-        body: itemData.description,
-      },
+      to: pushToken.token,
+      sound: 'default',
+      title: "Kay's Crochet Has New Items!",
+      body: itemData.description,
     };
-  });
+  }).filter(message => !!message);
 
-  admin.messaging().sendAll(messages)
-    .then((response) => {
-      console.log('Successfully sent messages:', response);
-    })
-    .catch((error) => {
-      console.log('Error sending messages:', error);
-    });
+  const chunks = expo.chunkPushNotifications(messages);
+  const sendPromises = [];
+  for (const chunk of chunks) {
+    sendPromises.push(expo.sendPushNotificationsAsync(chunk));
+  }
+
+  try {
+    await Promise.all(sendPromises);
+  } catch (error) {
+    console.error('Error sending push notifications:', error);
+  }
 };
-
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -79,16 +85,22 @@ aws.config.update({
 
 const s3 = new aws.S3();
 
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: 'kayscrochetmobilebucket',
-    acl: 'public-read',
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString())
-    }
-  })
-});
+const uploadToS3 = async (image) => {
+  const params = {
+    Bucket: 'kayscrochetmobilebucket',
+    Key: Date.now().toString(),
+    Body: image,
+    ACL: 'public-read'
+  };
+
+  try {
+    const data = await s3.upload(params).promise();
+    return data.Location;
+  } catch (error) {
+    console.error('Error uploading image to S3:', error);
+    throw error;
+  }
+};
 
 app.use(helmet());
 
@@ -122,9 +134,17 @@ app.get('/admin/check-auth', verifyToken, (req, res) => {
 });
 
 // Route to handle image upload
-app.post('/upload-images', upload.array('images', 10), (req, res) => {
-  const imageUrls = req.files.map(file => file.location);
-  res.send(imageUrls);
+app.post('/upload-images', async (req, res) => {
+  try {
+    const { base64 } = req.body;
+    const imageData = base64.split(';base64,').pop();
+    const imageBuffer = Buffer.from(imageData, 'base64');
+    const imageUrl = await uploadToS3(imageBuffer);
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ message: 'Failed to upload image' });
+  }
 });
 
 // GET all items
