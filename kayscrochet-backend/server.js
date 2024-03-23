@@ -4,10 +4,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Item = require('./models/item');
 const helmet = require('helmet');
-const aws = require('aws-sdk');
 const PushToken = require('./models/pushToken');
 const cors = require('cors');
 const Expo = require('expo-server-sdk').Expo
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 require('dotenv').config();
 
@@ -52,7 +52,10 @@ const sendPushNotification = async (itemData) => {
 };
 
 // Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connection successful'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
 
 // Admin Schema
 const adminSchema = new mongoose.Schema({
@@ -76,25 +79,30 @@ const verifyToken = (req, res, next) => {
     });
 };
 
-aws.config.update({
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  region: 'us-east-1'
+const s3Client = new S3Client({
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
-const s3 = new aws.S3();
-
-const uploadToS3 = async (image) => {
+const uploadToS3 = async (image, key) => {
   const params = {
     Bucket: 'kayscrochetmobilebucket',
-    Key: Date.now().toString(),
+    Key: key,
     Body: image,
-    ACL: 'public-read'
+    ACL: 'public-read',
   };
 
   try {
-    const data = await s3.upload(params).promise();
-    return data.Location;
+    const upload = new Upload({
+      client: s3Client,
+      params,
+    });
+
+    await upload.done();
+    return `https://${params.Bucket}.s3.amazonaws.com/${params.Key}`;
   } catch (error) {
     console.error('Error uploading image to S3:', error);
     throw error;
@@ -138,6 +146,7 @@ app.post('/api/upload', async (req, res) => {
     const base64Data = Buffer.from(req.body.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
     const imageKey = `${Date.now()}.jpg`;
 
+    // AWS SDK v3 upload parameters
     const params = {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: imageKey,
@@ -147,13 +156,16 @@ app.post('/api/upload', async (req, res) => {
       ACL: 'public-read',
     };
 
-    const uploadResult = await s3.upload(params).promise();
-    res.json({ Location: uploadResult.Location });
+    const command = new PutObjectCommand(params);
+
+    const uploadResult = await s3Client.send(command);
+    res.json({ Location: `https://${params.Bucket}.s3.amazonaws.com/${params.Key}` });
   } catch (error) {
     console.error('Error uploading image:', error);
     res.status(500).json({ message: 'Failed to upload image' });
   }
 });
+
 
 // GET all items
 app.get('/items', async (req, res) => {
