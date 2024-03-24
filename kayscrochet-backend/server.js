@@ -198,13 +198,16 @@ app.post('/items', async (req, res) => {
 app.delete('/items/:id', async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
-    if (!item) return res.status(404).json({ message: 'Item not found' });
-    await item.remove();
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+    await item.delete();
     res.json({ message: 'Item deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // Route for saving push tokens
 app.post('/save-push-token', async (req, res) => {
