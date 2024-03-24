@@ -153,7 +153,7 @@ app.post('/api/upload', async (req, res) => {
       Body: base64Data,
       ContentType: 'image/jpeg',
       ContentEncoding: 'base64',
-      ACL: 'public-read',
+      
     };
 
     const command = new PutObjectCommand(params);
@@ -228,11 +228,11 @@ app.post('/save-push-token', async (req, res) => {
 app.put('/items/:id', async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!item) 
+    return res.status(404).json({ message: 'Item not found' });
 
     // Update fields
     item.description = req.body.description || item.description;
-    item.date = req.body.date || item.date;
 
     const updatedItem = await item.save();
     res.json(updatedItem);
