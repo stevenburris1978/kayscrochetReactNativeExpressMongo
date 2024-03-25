@@ -1,54 +1,39 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+// AuthContext.js
+import React, { createContext, useState, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userToken, setUserToken] = useState(null);
-
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const token = await AsyncStorage.getItem('userToken');
-        if (token) {
-          setUserToken(token);
-          setIsAuthenticated(true);
-        }
-      } catch (e) {
-        console.error('Failed to fetch token', e);
-      }
-    };
-  
-    initializeAuth();
-  }, []);
-  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const signIn = async (token) => {
     try {
-      await AsyncStorage.setItem('userToken', token);
+      await AsyncStorage.setItem('userToken', token); // Saving token to local storage
       setUserToken(token);
       setIsAuthenticated(true);
-    } catch (e) {
-      console.error('Saving token failed', e);
+      // Additional logic for handling successful sign in (if needed)
+    } catch (error) {
+      console.error('Error during sign-in:', error);
+      // Handle errors (like showing an alert or a message to the user)
     }
   };
 
-  const logout = async () => {
+  const signOut = async () => {
     try {
-      await AsyncStorage.removeItem('userToken');
-      setIsAuthenticated(false);
+      await AsyncStorage.removeItem('userToken'); // Removing token from local storage
       setUserToken(null);
-    } catch (e) {
-      console.error('Removing token failed', e);
+      setIsAuthenticated(false);
+      // Additional logic for handling sign out (if needed)
+    } catch (error) {
+      console.error('Error during sign-out:', error);
+      // Handle errors (like showing an alert or a message to the user)
     }
   };
-
-  console.log({ isAuthenticated, userToken, signIn, logout });
-
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userToken, signIn, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userToken, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

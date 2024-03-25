@@ -58,26 +58,19 @@ const PoliciesScreen = () => {
         <Text style={styles.subHeader}>7. Under 13 Privacy</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Under 13 Policy: </Text>
-          Kay's Crochet is not directed at or meant for the use of children under the age of 13. We do not knowingly collect or keep personal information of children under the age of 13.
-          
+          Kay's Crochet is not directed at or meant for the use of children under the age of 13. We do not knowingly collect or keep personal information of children under the age of 13.        
           </Text>
-
-              {/* No Use of Cookies */}
-        <Text style={styles.subHeader}>8. No Use of Cookies</Text>
-        <Text style={styles.text}>
-          <Text style={styles.strong}>Cookies:</Text> Kay's Crochet does not use cookies or similar tracking technologies.
-        </Text>
 
         <Text style={styles.subHeader}>Additional Policies:</Text>
 
               {/* Sales Tax */}
-        <Text style={styles.subHeader}>9. Sales Tax</Text>
+        <Text style={styles.subHeader}>8. Sales Tax</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Tax Policy:</Text>  Sales tax is not included in the listed prices.
         </Text>
 
               {/* Shipping Policy */}
-        <Text style={styles.subHeader}>10. Shipping Policy</Text>
+        <Text style={styles.subHeader}>9. Shipping Policy</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Domestic Shipping:</Text> Shipping is included for the US only.
         </Text>
@@ -86,13 +79,13 @@ const PoliciesScreen = () => {
         </Text>
 
               {/*  Returns and Refunds */}
-        <Text style={styles.subHeader}>11. Returns and Refunds</Text>
+        <Text style={styles.subHeader}>10. Returns and Refunds</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Policy:</Text> There are no refunds and no returns. An invoice will be emailed upon payment.
         </Text>
 
               {/* Personal Information Usage */}
-        <Text style={styles.subHeader}>12. Personal Information Usage</Text>
+        <Text style={styles.subHeader}>11. Personal Information Usage</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Purpose:</Text> Kay's Crochet does not ever share any personal information.
         </Text>

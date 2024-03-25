@@ -9,23 +9,33 @@ import { AuthContext } from '../context/AuthContext';
 
 const AdminScreen = () => {
 
-  const { itemList, deleteItem, editItem, updateItem } = useContext(TaskContext);
+  const { itemList, deleteItem, editItem, updateItem, fetchItems } = useContext(TaskContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [description, setDescription] = useState("");
   const [itemId, setItemId] = useState(null);
   const { userToken } = useContext(AuthContext);
 
   const handleEditItem = (item) => {
-    setItemId(item.id);
-    setDescription(item.data.description);
+    setItemId(item._id);
+    setDescription(item.description);
     setModalVisible(true);
     editItem(item);
   };
 
-  const handleUpdateItem = () => {
+  const handleAdminPress = () => {
+    setModalVisible(false);
+  };
+
+  const handleUpdateItem = async () => {
     if (itemId) {
-      updateItem(itemId, { description });
-      setModalVisible(false);
+      try {
+        await updateItem(itemId, { description });
+        setModalVisible(false);
+        await fetchItems(); 
+      } catch (error) {
+        Alert.alert('Update Error', 'Failed to update the item.');
+        console.error('Update error:', error);
+      }
     }
   };
 
@@ -61,13 +71,13 @@ const AdminScreen = () => {
     <View>
       <FlatList
         ListHeaderComponent={AddItem}
-        data={itemList}
-        keyExtractor={(itemList) => itemList.id}
+        data={itemList.filter(item => item)}
+        keyExtractor={(item) => item._id.toString()}
         renderItem={({ item }) => (
           <Items
-            description={item.data.description}
-            date={item.data.date}
-            images={item.data.images}
+            description={item.description}
+            date={item.date}
+            images={item.images}
             
             renderRightActions={() => (
 
@@ -77,16 +87,16 @@ const AdminScreen = () => {
                     <MaterialCommunityIcons 
                       name="pencil"
                       size={40}
-                      color="midnightblue"
+                      color="hsl(270, 50%, 60%)"
                     />                   
                   </View>
                 </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback onPress={() => deleteItem(item.id)}>                
+                <TouchableWithoutFeedback onPress={() => deleteItem(item._id)}>                
                   <View style={styles.trashContainer}>
                     <MaterialCommunityIcons 
                       name="trash-can"
                       size={40}
-                      color="midnightblue"
+                      color="hsl(270, 50%, 60%)"
                     />
                   </View>
                 </TouchableWithoutFeedback>
@@ -99,22 +109,25 @@ const AdminScreen = () => {
       
       />
 
-<Modal visible={modalVisible} animationType="slide">
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Edit Details</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Item's Description"
-            value={description}
-            onChangeText={setDescription}
-          />
-          <TouchableOpacity style={styles.button} onPress={handleUpdateItem}>
-            <Text style={styles.buttonText}>Update</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-      </View>
-    </SafeAreaView>
+        <Modal visible={modalVisible} animationType="slide">
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Details</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Item's Description"
+              value={description}
+              onChangeText={setDescription}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleUpdateItem}>
+              <Text style={styles.buttonText}>Update</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleAdminPress}>
+              <Text style={styles.buttonText}>Admin</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+    </View>
+  </SafeAreaView>
   
   );
 
@@ -122,6 +135,7 @@ const AdminScreen = () => {
 
 const styles = StyleSheet.create({
   screen: {
+    flex: 1,
     paddingTop: Constants.StatusBarHeight,
     backgroundColor: "#F7E7F8",
   },
@@ -152,17 +166,29 @@ const styles = StyleSheet.create({
   },
 
   pencilContainer: {
-    flex: 3,
+    flex: 2,
+    borderTopRightRadius: 15,
+    borderTopLeftRadius: 5,
     backgroundColor: "lavenderblush",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: 'hsl(270, 50%, 60%)',
+    marginRight: "2%",
+
   },
 
   trashContainer: {
-    flex: 1,
+    flex: 2,
+    borderBottomRightRadius: 15,
+    borderBottomLeftRadius: 5,
     backgroundColor: "#F8D7DA",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: 'hsl(270, 50%, 60%)',
+    marginRight: "2%",
+    marginBottom: "4%",
   },
   modalContent: {
     backgroundColor: "#F7E7F8",

@@ -6,33 +6,31 @@ const AdminLoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const authContext = useContext(AuthContext);
-  console.log('AuthContext:', authContext); 
-  const { signIn } = authContext;
-  console.log('signIn function:', signIn);
+  
+  const { signIn } = useContext(AuthContext);
 
   const handleLogin = async () => {
     try {
       const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/admin/login', {
           method: 'POST',
           headers: {
-              'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({ username, password }),
-      });
+        });
 
-      if (!response.ok) {
+        if (!response.ok) {
           throw new Error('Login failed');
-      }
+        }
 
-      const { token } = await response.json();
-      await signIn(token); 
-      navigation.navigate('AdminScreen');
-    } catch (error) {
-      setError('Incorrect username or password');
-      setTimeout(() => setError(''), 3000);
-    }
-  };
+        const { token } = await response.json();
+        await signIn(token);
+        navigation.navigate('AdminScreen');
+      } catch (error) {
+        setError('Incorrect username or password');
+        setTimeout(() => setError(''), 3000);
+      }
+    };
   
 
 

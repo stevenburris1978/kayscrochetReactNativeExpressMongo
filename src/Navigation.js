@@ -34,7 +34,7 @@ const { isAuthenticated } = useAuth();
         name="Home" 
         component={HomeScreen} 
         options={{
-          headerTitle: () => <CustomScreenHeader title="" showBack={false} />, 
+          headerTitle: () => <View style={{ height: 0 }} />,
           drawerLabel: () => (
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <Icon name="arrow-back" size={24} color="hsl(270, 50%, 60%)" />
@@ -59,7 +59,7 @@ const { isAuthenticated } = useAuth();
             </Text>
           ),
           headerStyle: {
-            backgroundColor: '#F7E7F8',
+            backgroundColor: '#F8D7DA',
           },
         }}
       />
@@ -74,7 +74,7 @@ const { isAuthenticated } = useAuth();
             </Text>
           ),
           headerStyle: {
-            backgroundColor: '#F7E7F8',
+            backgroundColor: '#F8D7DA',
           },
         }}
       />
@@ -85,7 +85,7 @@ const { isAuthenticated } = useAuth();
           headerTitle: () => <CustomScreenHeader title="Kay's Crochet" showBack={true} />,
           drawerItemStyle: { height: 0 },
           headerStyle: {
-            backgroundColor: '#F7E7F8',
+            backgroundColor: '#F8D7DA',
           },
         }}
       />
@@ -97,7 +97,7 @@ const { isAuthenticated } = useAuth();
             headerTitle: () => <CustomScreenHeader title="Kay's Crochet" showBack={true} />,
             drawerItemStyle: { height: 0 },
             headerStyle: {
-              backgroundColor: '#F7E7F8',
+              backgroundColor: '#F8D7DA',
             },
           }}
         />
@@ -113,7 +113,7 @@ const { isAuthenticated } = useAuth();
             </View>
           ),
           headerStyle: {
-            backgroundColor: '#F7E7F8',
+            backgroundColor: '#F8D7DA',
           },
         }}
       />

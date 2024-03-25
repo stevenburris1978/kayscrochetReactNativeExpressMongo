@@ -9,7 +9,7 @@ const CustomDrawerContent = (props) => {
     if (tapCount === 6) {
       console.log('Navigating to AdminLoginScreen...');
       props.navigation.navigate('AdminLogin');
-      setTapCount(0); // Reset the tap count after navigation
+      setTapCount(0); 
     }
 
     return () => {

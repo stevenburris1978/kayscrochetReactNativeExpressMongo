@@ -41,9 +41,9 @@ export const TaskProvider = ({ children }) => {
         body: JSON.stringify(newItem),
       });
       if (response.ok) {
-        fetchItems(); // Refresh the list after adding
+        const addedItem = await response.json();
+        setItemList(prevItems => [...prevItems, addedItem]);
       } else {
-        // Handle errors
         console.error('Error adding item:', await response.json());
       }
     } catch (error) {
@@ -52,7 +52,7 @@ export const TaskProvider = ({ children }) => {
   };
 
   // Delete Item
-  const deleteItem = (id) => {
+  const deleteItem = (_id) => {
     Alert.alert(
       "Delete Item",
       "Are you sure you want to delete?",
@@ -65,7 +65,7 @@ export const TaskProvider = ({ children }) => {
           text: "Delete",
           onPress: async () => {
             try {
-              const response = await fetch(`https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items/${id}`, {
+              const response = await fetch(`https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items/${_id}`, {
                 method: 'DELETE',
               });
               if (response.ok) {
@@ -89,29 +89,30 @@ export const TaskProvider = ({ children }) => {
   };
 
   // Update Item
-  const updateItem = async (id, updItem) => {
+  const updateItem = async (_id, updItem) => {
     try {
-      const response = await fetch(`https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items/${id}`, {
+      console.log(`Updating item with id: ${_id} and data: `, updItem);
+      const response = await fetch(`https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items/${_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updItem),
       });
-      if (response.ok) {
-        fetchItems(); // Refresh the list after updating
-      } else {
-        // Handle errors
-        console.error('Error updating item:', await response.json());
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error updating item.");
       }
     } catch (error) {
       console.error('Network error:', error);
+      throw error;
     }
   };
 
   return (
     <TaskContext.Provider
-      value={{ itemList, addItem, editItem, updateItem, deleteItem, itemEdit }}
+      value={{ itemList, addItem, editItem, updateItem, deleteItem, itemEdit, fetchItems }}
     >
       {children}
     </TaskContext.Provider>

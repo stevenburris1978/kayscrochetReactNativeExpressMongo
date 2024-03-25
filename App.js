@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Navigation from './src/Navigation';
 import { AuthProvider } from './src/context/AuthContext'; 
 import { TaskProvider } from './src/context/TaskContext';
+import * as Device from 'expo-device';
 
 // Define isPortrait for orientation
 const isPortrait = () => {
