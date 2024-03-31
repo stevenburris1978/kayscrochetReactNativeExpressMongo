@@ -50,7 +50,7 @@ const AdminScreen = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.message); // "Authenticated"
+        console.log(data.message); 
         // Proceed with showing admin content
       } else {
         Alert.alert('Authentication Failed', 'You are not authorized to access this page.');

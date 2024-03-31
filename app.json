@@ -2,7 +2,7 @@
   "expo": {
     "name": "Kay's Crochet",
     "slug": "kayscrochet",
-    "version": "1.0.0",
+    "version": "1.0.6",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,8 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to upload images.",
         "NSCameraUsageDescription": "This app requires access to the camera to take photos."
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +29,9 @@
         "backgroundColor": "#FFC5CF"
       },
       "package": "com.stevenburris1978.kayscrochet",
-      "permissions": ["CAMERA", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": ["CAMERA", "WRITE_EXTERNAL_STORAGE"],
+      "versionCode": 6,
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/icon.png"

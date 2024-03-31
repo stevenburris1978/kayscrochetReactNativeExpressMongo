@@ -9,14 +9,14 @@ const PoliciesScreen = () => {
             <Text style={styles.screenTitle}>POLICY:</Text>
             <Text style={styles.header}>Effective Date: 2023</Text>
         <Text style={styles.text}>
-          Welcome to Kay's Crochet. This section outlines all Kay's Crochet policies, including the Privacy Policy and additional terms related to sales, shipping, and returns. By using Kay's Crochet app, you agree to these terms.
+          Welcome to Kay's Crochet. This section outlines all Kay's Crochet policies, including the Privacy Policy and additional terms related to sales, shipping, returns, and data deletion. By using Kay's Crochet app, you agree to these terms.
         </Text>
         <Text style={styles.text}>
         See beautiful crocheted items for sale at www.kayscrochet.us  Handmade by Kay with love and care.
         </Text>
         <Text style={styles.subHeader}>Privacy Policy:</Text>
 
-        {/* Information Collection and Use */}
+              {/* Information Collection and Use */}
         <Text style={styles.subHeader}>1. Information Collection and Use</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Personal Information Collected:</Text> Email address, mailing address, and full name for transactions and delivery of products.
@@ -24,13 +24,14 @@ const PoliciesScreen = () => {
         <Text style={styles.text}>
           <Text style={styles.strong}>Purpose:</Text> To process transactions and deliver products purchased through Kay's Crochet.
         </Text>
-                    {/* Data Sharing */}
+              {/* Data Sharing */}
         <Text style={styles.subHeader}>2. Data Security</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Measures:</Text> Kay's Crochet secures payments with Stripe (www.stripe.com) and secures user credentials with Django authentication.
+          <Text style={styles.strong}>Registration:</Text> Users must sign up with username and email address to interact with the site to like or buy items.
         </Text>
 
-                    {/* Changes to Privacy Policy */}
+              {/* Changes to Privacy Policy */}
         <Text style={styles.subHeader}>3. Changes to Privacy Policy</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Notifications:</Text> Policy updates will be communicated via email. Continued use of Kay's Crochet after changes constitutes acceptance of the new terms.
@@ -42,10 +43,10 @@ const PoliciesScreen = () => {
           <Text style={styles.strong}>Policy:</Text> Kay's Crochet does not share, sell, rent, or trade user's personal information with third parties for commercial purposes.
         </Text>
 
-              {/* User Rights */}
-        <Text style={styles.subHeader}>5. User Rights</Text>
+              {/* User Data Rights */}
+        <Text style={styles.subHeader}>5. User Data Rights</Text>
         <Text style={styles.text}>
-          <Text style={styles.strong}>Access and Control:</Text> Users can request to access their data, request corrections or updates, and ask for data deletion via kayscrochetus@gmail.com.
+          <Text style={styles.strong}>Access and Control:</Text> Users can request to access their data, request corrections or updates, and ask for data deletion by emailing kayscrochetus@gmail.com. Please allow up to 30 days for data and account deletion requestions.
         </Text>
 
               {/* Compliance with Laws */}
@@ -57,20 +58,27 @@ const PoliciesScreen = () => {
               {/* Under 13 Privacy */}
         <Text style={styles.subHeader}>7. Under 13 Privacy</Text>
         <Text style={styles.text}>
-          <Text style={styles.strong}>Under 13 Policy: </Text>
+        <Text style={styles.strong}>Under 13 Policy: </Text>
           Kay's Crochet is not directed at or meant for the use of children under the age of 13. We do not knowingly collect or keep personal information of children under the age of 13.        
-          </Text>
+        </Text>
+
+              {/* Permissions */}
+        <Text style={styles.subHeader}>8. Permissions</Text>
+        <Text style={styles.text}>
+        <Text style={styles.strong}>Permissions Policy: </Text>
+          Camera permission is used by Kay's Crochet to add pictures of crocheted items for sale. User's only need permissions to receive push notifications to their device when an item is added and for app updates.       
+        </Text>
 
         <Text style={styles.subHeader}>Additional Policies:</Text>
 
               {/* Sales Tax */}
-        <Text style={styles.subHeader}>8. Sales Tax</Text>
+        <Text style={styles.subHeader}>9. Sales Tax</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Tax Policy:</Text>  Sales tax is not included in the listed prices.
         </Text>
 
               {/* Shipping Policy */}
-        <Text style={styles.subHeader}>9. Shipping Policy</Text>
+        <Text style={styles.subHeader}>10. Shipping Policy</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Domestic Shipping:</Text> Shipping is included for the US only.
         </Text>
@@ -79,13 +87,13 @@ const PoliciesScreen = () => {
         </Text>
 
               {/*  Returns and Refunds */}
-        <Text style={styles.subHeader}>10. Returns and Refunds</Text>
+        <Text style={styles.subHeader}>11. Returns and Refunds</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Policy:</Text> There are no refunds and no returns. An invoice will be emailed upon payment.
         </Text>
 
               {/* Personal Information Usage */}
-        <Text style={styles.subHeader}>11. Personal Information Usage</Text>
+        <Text style={styles.subHeader}>12. Personal Information Usage</Text>
         <Text style={styles.text}>
           <Text style={styles.strong}>Purpose:</Text> Kay's Crochet does not ever share any personal information.
         </Text>
