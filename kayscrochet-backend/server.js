@@ -13,7 +13,7 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 require('dotenv').config();
 
 admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_PATH))
 });
 
 const app = express();
@@ -200,7 +200,7 @@ app.post('/save-push-token', async (req, res) => {
 
 const sendPushNotification = async (itemData) => {
   const tokens = await PushToken.find({});
-  const fcmTokens = tokens.map(t => t.token); // These should be FCM tokens
+  const fcmTokens = tokens.map(t => t.token); 
 
   if (fcmTokens.length > 0) {
     const message = {
@@ -215,14 +215,13 @@ const sendPushNotification = async (itemData) => {
       const response = await admin.messaging().sendMulticast(message);
       console.log('Notifications sent successfully:', response);
 
-      // Checking for any failures
       const failedTokens = response.responses
                                .map((resp, idx) => resp.success ? null : fcmTokens[idx])
                                .filter(token => token != null);
 
       if (failedTokens.length > 0) {
         console.log('Failed tokens:', failedTokens);
-        // Here you can handle the failed tokens (e.g., remove them from DB)
+
       }
     } catch (error) {
       console.error('Error sending notifications:', error);
