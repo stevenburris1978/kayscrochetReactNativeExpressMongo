@@ -24,32 +24,26 @@ admin.initializeApp({
 
 const sendPushNotification = async (itemData) => {
   const tokens = await PushToken.find({});
-  const expo = new Expo();
-  const messages = tokens.map(pushToken => {
-    if (!Expo.isExpoPushToken(pushToken.token)) {
-      console.error(`Push token ${pushToken.token} is not a valid Expo push token`);
-      return null;
-    }
-    return {
-      to: pushToken.token,
-      sound: 'default',
-      title: "Kay's Crochet Has New Items!",
-      body: itemData.description,
+  const firebaseTokens = tokens.map(t => t.token);
+
+  if (firebaseTokens.length > 0) {
+    const message = {
+      notification: {
+        title: "Kay's Crochet Has New Items!",
+        body: itemData.description
+      },
+      tokens: firebaseTokens,
     };
-  }).filter(message => !!message);
 
-  const chunks = expo.chunkPushNotifications(messages);
-  const sendPromises = [];
-  for (const chunk of chunks) {
-    sendPromises.push(expo.sendPushNotificationsAsync(chunk));
-  }
-
-  try {
-    await Promise.all(sendPromises);
-  } catch (error) {
-    console.error('Error sending push notifications:', error);
+    try {
+      await admin.messaging().sendMulticast(message);
+      console.log('Notifications sent successfully');
+    } catch (error) {
+      console.error('Error sending notifications:', error);
+    }
   }
 };
+
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI)
@@ -207,22 +201,32 @@ app.delete('/items/:id', async (req, res) => {
   }
 });
 
-// Route for saving push tokens
 app.post('/save-push-token', async (req, res) => {
-  const { token } = req.body;
-
   try {
-    let pushToken = await PushToken.findOne({ token });
-    if (!pushToken) {
-      pushToken = new PushToken({ token });
-      await pushToken.save();
+    console.log('Received token save request:', req.body);
+    const { token } = req.body;
+    
+    const existingToken = await PushToken.findOne({ token });
+    if (existingToken) {
+      console.log('Token already exists in database');
+      // Change this to a JSON response
+      return res.status(200).json({ message: 'Token already exists.' });
     }
-    res.status(200).send('Token saved.');
+
+    const newToken = new PushToken({ token });
+    await newToken.save();
+    console.log('Token saved successfully');
+    // Change this to a JSON response
+    res.status(200).json({ message: 'Token saved successfully.' });
   } catch (error) {
-    console.error('Error saving token:', error);
-    res.status(500).send('Error saving token.');
+    console.error('Error in /save-push-token endpoint:', error);
+    // Send error details in JSON format
+    res.status(500).json({ error: 'Error saving token.' });
   }
 });
+
+
+
 
 // update an item
 app.put('/items/:id', async (req, res) => {
