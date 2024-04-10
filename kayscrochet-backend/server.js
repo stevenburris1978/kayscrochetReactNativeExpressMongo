@@ -24,29 +24,27 @@ admin.initializeApp({
 
 const sendPushNotification = async (itemData) => {
   const tokens = await PushToken.find({});
-  const firebaseTokens = tokens.map(t => t.token);
+  const fcmTokens = tokens.map(t => t.token); // These should be FCM tokens
 
-  if (firebaseTokens.length > 0) {
+  if (fcmTokens.length > 0) {
     const message = {
       notification: {
         title: "Kay's Crochet Has New Items!",
         body: itemData.description
       },
-      tokens: firebaseTokens,
+      tokens: fcmTokens,
     };
 
     try {
       const response = await admin.messaging().sendMulticast(message);
-      console.log('Notifications sent successfully', response);
-      // Check the response to identify tokens that are not registered anymore.
+      console.log('Notifications sent successfully:', response);
+
+      // Check for tokens that failed
       if (response.failureCount > 0) {
-        const failedTokens = [];
-        response.responses.forEach((resp, idx) => {
-          if (!resp.success) {
-            failedTokens.push(firebaseTokens[idx]);
-          }
-        });
-        console.log('List of tokens that caused failures: ', failedTokens);
+        const failedTokens = response.responses
+          .map((r, idx) => !r.success ? fcmTokens[idx] : null)
+          .filter(t => t != null);
+        console.log('Failed tokens:', failedTokens);
       }
     } catch (error) {
       console.error('Error sending notifications:', error);
