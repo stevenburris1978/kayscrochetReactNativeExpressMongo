@@ -4,12 +4,17 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Item = require('./models/item');
 const helmet = require('helmet');
+const admin = require('firebase-admin');
 const PushToken = require('./models/pushToken');
 const cors = require('cors');
 const Expo = require('expo-server-sdk').Expo
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 require('dotenv').config();
+
+admin.initializeApp({
+  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+});
 
 const app = express();
 
@@ -21,38 +26,6 @@ const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-
-const sendPushNotification = async (itemData) => {
-  const tokens = await PushToken.find({});
-  const fcmTokens = tokens.map(t => t.token); // These should be FCM tokens
-
-  if (fcmTokens.length > 0) {
-    const message = {
-      notification: {
-        title: "Kay's Crochet Has New Items!",
-        body: itemData.description
-      },
-      tokens: fcmTokens,
-    };
-
-    try {
-      const response = await admin.messaging().sendMulticast(message);
-      console.log('Notifications sent successfully:', response);
-
-      // Check for tokens that failed
-      if (response.failureCount > 0) {
-        const failedTokens = response.responses
-          .map((r, idx) => !r.success ? fcmTokens[idx] : null)
-          .filter(t => t != null);
-        console.log('Failed tokens:', failedTokens);
-      }
-    } catch (error) {
-      console.error('Error sending notifications:', error);
-    }
-  }
-};
-
-
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI)
@@ -211,31 +184,51 @@ app.delete('/items/:id', async (req, res) => {
 });
 
 app.post('/save-push-token', async (req, res) => {
+  const { token } = req.body;
   try {
-    console.log('Received token save request:', req.body);
-    const { token } = req.body;
-    
     const existingToken = await PushToken.findOne({ token });
-    if (existingToken) {
-      console.log('Token already exists in database');
-      // Change this to a JSON response
-      return res.status(200).json({ message: 'Token already exists.' });
+    if (!existingToken) {
+      const newToken = new PushToken({ token });
+      await newToken.save();
     }
-
-    const newToken = new PushToken({ token });
-    await newToken.save();
-    console.log('Token saved successfully');
-    // Change this to a JSON response
     res.status(200).json({ message: 'Token saved successfully.' });
   } catch (error) {
-    console.error('Error in /save-push-token endpoint:', error);
-    // Send error details in JSON format
+    console.error('Error saving token:', error);
     res.status(500).json({ error: 'Error saving token.' });
   }
 });
 
+const sendPushNotification = async (itemData) => {
+  const tokens = await PushToken.find({});
+  const fcmTokens = tokens.map(t => t.token); // These should be FCM tokens
 
+  if (fcmTokens.length > 0) {
+    const message = {
+      notification: {
+        title: "New Item Alert",
+        body: itemData.description
+      },
+      tokens: fcmTokens,
+    };
 
+    try {
+      const response = await admin.messaging().sendMulticast(message);
+      console.log('Notifications sent successfully:', response);
+
+      // Checking for any failures
+      const failedTokens = response.responses
+                               .map((resp, idx) => resp.success ? null : fcmTokens[idx])
+                               .filter(token => token != null);
+
+      if (failedTokens.length > 0) {
+        console.log('Failed tokens:', failedTokens);
+        // Here you can handle the failed tokens (e.g., remove them from DB)
+      }
+    } catch (error) {
+      console.error('Error sending notifications:', error);
+    }
+  }
+};
 
 // update an item
 app.put('/items/:id', async (req, res) => {
