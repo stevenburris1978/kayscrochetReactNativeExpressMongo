@@ -12,3 +12,5 @@ data/
 
 #admin user hash creator file
 createAdmin.js
+
+config/

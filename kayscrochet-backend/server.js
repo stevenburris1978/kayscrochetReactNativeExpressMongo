@@ -16,11 +16,8 @@ const app = express();
 
 app.use(cors());
 
-const admin = require('firebase-admin');
-const serviceAccount = require('./config/kayscrochetmobileapp-dd1e8-firebase-adminsdk-0opt5-4b0fa2b75b.json');
-
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)),
 });
 
 // Connect to MongoDB Atlas
