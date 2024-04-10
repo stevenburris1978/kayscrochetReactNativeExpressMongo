@@ -17,23 +17,6 @@ const App = () => {
 
   const [orientation, setOrientation] = useState(isPortrait() ? 'portrait' : 'landscape');
 
-  useEffect(() => {
-
-    registerForPushNotificationsAsync();
-    setupNotificationListeners();
-
-    const subscription = Dimensions.addEventListener('change', () => {
-      setOrientation(isPortrait() ? 'portrait' : 'landscape');
-    });
-
-    return () => {
-      if (subscription) {
-        subscription.remove();
-      }
-    };
-
-  }, []);
-
   const handleOrientationChange = () => {
     setOrientation(isPortrait() ? 'portrait' : 'landscape');
   };
@@ -85,6 +68,21 @@ const App = () => {
     console.log('Notification Response:', response);
     // Handle notification response (user interaction)
   };
+
+  useEffect(() => {
+
+    (async () => {
+      await registerForPushNotificationsAsync();
+      setupNotificationListeners();
+    })();
+
+    const subscription = Dimensions.addEventListener('change', () => {
+      setOrientation(isPortrait() ? 'portrait' : 'landscape');
+    });
+
+    return () => subscription?.remove();
+
+  }, []);
 
   return (
     <AuthProvider>

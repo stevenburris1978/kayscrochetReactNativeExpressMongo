@@ -37,12 +37,16 @@ yarn-error.*
 
 kayscrochet-backend/createAdmin.js
 
+kayscrochet-backend/config
+
 kayscrochet-backend/.env
 
 .idea/
 
 %ProgramData%/
 
-google-services.json
+assets/icon(android).png
 
-GoogleService-Info.plist
+assets/adaptive-icon(android).png
+
+AuthKey_2W7SFTU5A5.p8/
