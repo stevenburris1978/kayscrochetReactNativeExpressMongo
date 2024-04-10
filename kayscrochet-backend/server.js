@@ -36,13 +36,24 @@ const sendPushNotification = async (itemData) => {
     };
 
     try {
-      await admin.messaging().sendMulticast(message);
-      console.log('Notifications sent successfully');
+      const response = await admin.messaging().sendMulticast(message);
+      console.log('Notifications sent successfully', response);
+      // Check the response to identify tokens that are not registered anymore.
+      if (response.failureCount > 0) {
+        const failedTokens = [];
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            failedTokens.push(firebaseTokens[idx]);
+          }
+        });
+        console.log('List of tokens that caused failures: ', failedTokens);
+      }
     } catch (error) {
       console.error('Error sending notifications:', error);
     }
   }
 };
+
 
 
 // Connect to MongoDB Atlas
