@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Item = require('./models/item');
 const helmet = require('helmet');
-const admin = require('firebase-admin');
 const PushToken = require('./models/pushToken');
 const cors = require('cors');
 const Expo = require('expo-server-sdk').Expo
@@ -16,9 +15,41 @@ const app = express();
 
 app.use(cors());
 
+const admin = require('firebase-admin');
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
+
 admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)),
+  credential: admin.credential.cert(serviceAccount),
 });
+
+const sendPushNotification = async (itemData) => {
+  const tokens = await PushToken.find({});
+  const expo = new Expo();
+  const messages = tokens.map(pushToken => {
+    if (!Expo.isExpoPushToken(pushToken.token)) {
+      console.error(`Push token ${pushToken.token} is not a valid Expo push token`);
+      return null;
+    }
+    return {
+      to: pushToken.token,
+      sound: 'default',
+      title: "Kay's Crochet Has New Items!",
+      body: itemData.description,
+    };
+  }).filter(message => !!message);
+
+  const chunks = expo.chunkPushNotifications(messages);
+  const sendPromises = [];
+  for (const chunk of chunks) {
+    sendPromises.push(expo.sendPushNotificationsAsync(chunk));
+  }
+
+  try {
+    await Promise.all(sendPromises);
+  } catch (error) {
+    console.error('Error sending push notifications:', error);
+  }
+};
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI)
@@ -176,51 +207,22 @@ app.delete('/items/:id', async (req, res) => {
   }
 });
 
+// Route for saving push tokens
 app.post('/save-push-token', async (req, res) => {
   const { token } = req.body;
+
   try {
-    const existingToken = await PushToken.findOne({ token });
-    if (!existingToken) {
-      const newToken = new PushToken({ token });
-      await newToken.save();
+    let pushToken = await PushToken.findOne({ token });
+    if (!pushToken) {
+      pushToken = new PushToken({ token });
+      await pushToken.save();
     }
-    res.status(200).json({ message: 'Token saved successfully.' });
+    res.status(200).send('Token saved.');
   } catch (error) {
     console.error('Error saving token:', error);
-    res.status(500).json({ error: 'Error saving token.' });
+    res.status(500).send('Error saving token.');
   }
 });
-
-const sendPushNotification = async (itemData) => {
-  const tokens = await PushToken.find({});
-  const fcmTokens = tokens.map(t => t.token); 
-
-  if (fcmTokens.length > 0) {
-    const message = {
-      notification: {
-        title: "New Item Alert",
-        body: itemData.description
-      },
-      tokens: fcmTokens,
-    };
-
-    try {
-      const response = await admin.messaging().sendMulticast(message);
-      console.log('Notifications sent successfully:', response);
-
-      const failedTokens = response.responses
-                               .map((resp, idx) => resp.success ? null : fcmTokens[idx])
-                               .filter(token => token != null);
-
-      if (failedTokens.length > 0) {
-        console.log('Failed tokens:', failedTokens);
-
-      }
-    } catch (error) {
-      console.error('Error sending notifications:', error);
-    }
-  }
-};
 
 // update an item
 app.put('/items/:id', async (req, res) => {
