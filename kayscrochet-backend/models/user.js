@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Pre-save hook to hash the password
+//save hook to hash the password
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
 
@@ -27,12 +27,10 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Helper method to validate password
 userSchema.methods.validatePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Create the model
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

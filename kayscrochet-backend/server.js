@@ -23,7 +23,14 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-app.use(cors());
+const corsOptions = {
+  origin: true,  
+  credentials: true, 
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE'
+};
+
+app.use(cors(corsOptions));
+
 
 app.use(helmet({
   contentSecurityPolicy: {
