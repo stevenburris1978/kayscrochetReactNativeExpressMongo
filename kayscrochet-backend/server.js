@@ -23,28 +23,24 @@ admin.initializeApp({
 });
 
 const sendPushNotification = async (itemData) => {
-  const tokens = await PushToken.find({});
-  const expo = new Expo();
-  const messages = tokens.map(pushToken => {
-    if (!Expo.isExpoPushToken(pushToken.token)) {
-      console.error(`Push token ${pushToken.token} is not a valid Expo push token`);
-      return null;
-    }
-    return {
-      to: pushToken.token,
-      sound: 'default',
-      title: "Kay's Crochet Has New Items!",
-      body: itemData.description,
-    };
-  }).filter(message => !!message);
-
-  const chunks = expo.chunkPushNotifications(messages);
-  const sendPromises = [];
-  for (const chunk of chunks) {
-    sendPromises.push(expo.sendPushNotificationsAsync(chunk));
-  }
-
   try {
+    const tokens = await PushToken.find({});
+    const expo = new Expo();
+    const messages = tokens.map(pushToken => {
+      if (!Expo.isExpoPushToken(pushToken.token)) {
+        console.error(`Push token ${pushToken.token} is not a valid Expo push token`);
+        return null;
+      }
+      return {
+        to: pushToken.token,
+        sound: 'default',
+        title: "Kay's Crochet Has New Items!",
+        body: itemData.description,
+      };
+    }).filter(message => !!message);
+
+    const chunks = expo.chunkPushNotifications(messages);
+    const sendPromises = chunks.map(chunk => expo.sendPushNotificationsAsync(chunk));
     await Promise.all(sendPromises);
   } catch (error) {
     console.error('Error sending push notifications:', error);
