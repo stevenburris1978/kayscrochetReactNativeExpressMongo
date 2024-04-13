@@ -25,36 +25,36 @@ admin.initializeApp({
 const sendPushNotification = async (itemData) => {
   const tokens = await PushToken.find({});
   const expo = new Expo();
-  let messages = [];
-  for (let pushToken of tokens) {
-      if (!Expo.isExpoPushToken(pushToken.token)) {
-          console.error(`Push token ${pushToken.token} is not a valid Expo push token`);
-          await PushToken.findByIdAndDelete(pushToken._id); // Clean up invalid tokens
-          continue;
-      }
-      messages.push({
-          to: pushToken.token,
-          sound: 'default',
-          title: "Kay's Crochet Has New Items!",
-          body: itemData.description,
-      });
-  }
+  const messages = tokens.map(pushToken => {
+    if (!Expo.isExpoPushToken(pushToken.token)) {
+      console.error(`Push token ${pushToken.token} is not a valid Expo push token`);
+      return null;
+    }
+    return {
+      to: pushToken.token,
+      sound: 'default',
+      title: "Kay's Crochet Has New Items!",
+      body: itemData.description,
+    };
+  }).filter(message => !!message);
 
   const chunks = expo.chunkPushNotifications(messages);
-  const sendPromises = chunks.map(chunk => expo.sendPushNotificationsAsync(chunk));
+  const sendPromises = [];
+  for (const chunk of chunks) {
+    sendPromises.push(expo.sendPushNotificationsAsync(chunk));
+  }
+
   try {
-      await Promise.all(sendPromises);
+    await Promise.all(sendPromises);
   } catch (error) {
-      console.error('Error sending push notifications:', error);
+    console.error('Error sending push notifications:', error);
   }
 };
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  autoReconnect: true,
-}).then(() => console.log('MongoDB connection successful'))
-.catch(err => console.error('MongoDB connection error:', err));
+// Connect to MongoDB Atlas
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connection successful'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 
 // Admin Schema
