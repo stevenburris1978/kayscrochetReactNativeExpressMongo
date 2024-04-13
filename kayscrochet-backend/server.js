@@ -1,5 +1,4 @@
 const express = require('express');
-const { body, validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -116,38 +115,25 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err.stack);
-  const status = err.status || 500;
-  const message = err.message || 'Internal Server Error';
-  res.status(status).json({ error: message });
+    console.error(err.stack);  
+    res.status(500).send('An error occurred');
 });
 
-// POST - Admin login
-app.post('/admin/login', [
-  body('username').isString().trim().escape(),
-  body('password').isLength({ min: 5 }).trim().escape()
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { username, password } = req.body;
-  try {
+app.post('/admin/login', async (req, res) => {
+    const { username, password } = req.body;
     const admin = await Admin.findOne({ username });
+
     if (!admin) {
-      return res.status(401).json({ message: 'Admin not found' });
+        return res.status(401).send('Admin not found');
     }
-    const passwordMatch = await bcrypt.compare(password, admin.password);
-    if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid password' });
+
+    if (!await bcrypt.compare(password, admin.password)) {
+        return res.status(401).send('Invalid password');
     }
+
+    // Create a token
     const token = jwt.sign({ username: admin.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
-  } catch (error) {
-    console.error('Error logging in:', error);
-    res.status(500).json({ message: 'Server error during admin login' });
-  }
 });
 
 app.get('/admin/check-auth', verifyToken, (req, res) => {
@@ -155,25 +141,23 @@ app.get('/admin/check-auth', verifyToken, (req, res) => {
 });
 
 // Route to handle image upload
-app.post('/api/upload', [
-  body('image').notEmpty().withMessage('Image data cannot be empty.')
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
+app.post('/api/upload', async (req, res) => {
   try {
     const base64Data = Buffer.from(req.body.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
     const imageKey = `${Date.now()}.jpg`;
+
+    // AWS SDK v3 upload parameters
     const params = {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: imageKey,
       Body: base64Data,
       ContentType: 'image/jpeg',
       ContentEncoding: 'base64',
+      
     };
+
     const command = new PutObjectCommand(params);
+
     const uploadResult = await s3Client.send(command);
     res.json({ Location: `https://${params.Bucket}.s3.amazonaws.com/${params.Key}` });
   } catch (error) {
@@ -181,6 +165,7 @@ app.post('/api/upload', [
     res.status(500).json({ message: 'Failed to upload image' });
   }
 });
+
 
 // GET all items
 app.get('/items', async (req, res) => {
@@ -193,34 +178,24 @@ app.get('/items', async (req, res) => {
   });
   
 // POST a new item
-app.post('/items', [
-  body('description').isString().trim().escape().withMessage('Description must be a valid string.'),
-  body('date').isISO8601().toDate().withMessage('Invalid date format.'),
-  body('images').isArray().withMessage('Images must be an array.')
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+app.post('/items', async (req, res) => {
+  const newItem = new Item({
+    description: req.body.description,
+    date: req.body.date,
+    images: req.body.images,
+  });
 
   try {
-    const newItem = new Item({
-      description: req.body.description,
-      date: req.body.date,
-      images: req.body.images,
-    });
     const savedItem = await newItem.save();
     sendPushNotification(savedItem); 
     res.status(201).json(savedItem);
   } catch (error) {
-    res.status(400).json({ message: 'Error saving the new item.' });
+    res.status(400).json({ message: error.message });
   }
 });
 
 // DELETE an item
-app.delete('/items/:id', [
-  body('id').isMongoId().withMessage('Invalid MongoDB ID.')
-], async (req, res) => {
+app.delete('/items/:id', async (req, res) => {
   try {
     const item = await Item.findByIdAndDelete(req.params.id);
     if (!item) {
@@ -228,20 +203,14 @@ app.delete('/items/:id', [
     }
     res.json({ message: 'Item deleted' });
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting the item.' });
+    res.status(500).json({ message: error.message });
   }
 });
 
-// POST - Save push tokens
-app.post('/save-push-token', [
-  body('token').isString().trim().isLength({ min: 20 })
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
+// Route for saving push tokens
+app.post('/save-push-token', async (req, res) => {
   const { token } = req.body;
+
   try {
     let pushToken = await PushToken.findOne({ token });
     if (!pushToken) {
@@ -256,23 +225,19 @@ app.post('/save-push-token', [
 });
 
 // update an item
-app.put('/items/:id', [
-  body('id').isMongoId().withMessage('Invalid MongoDB ID.'),
-  body('description').optional().isString().trim().escape().withMessage('Description must be a valid string.')
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
+app.put('/items/:id', async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!item) 
+    return res.status(404).json({ message: 'Item not found' });
+
+    // Update fields
     item.description = req.body.description || item.description;
+
     const updatedItem = await item.save();
     res.json(updatedItem);
   } catch (error) {
-    res.status(400).json({ message: 'Error updating the item.' });
+    res.status(400).json({ message: error.message });
   }
 });
 

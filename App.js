@@ -21,38 +21,50 @@ const App = () => {
     setOrientation(isPortrait() ? 'portrait' : 'landscape');
   };
 
-  const registerForPushNotificationsAsync = async () => {
-    let token;
-    if (Device.isDevice) {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('No notification permissions!');
+  async function registerForPushNotificationsAsync() {
+    if (!Device.isDevice) {
+        console.warn('Must use physical device for Push Notifications');
         return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
-
-      sendPushTokenToBackend(token);
-    } else {
-      console.log('Must use physical device for Push Notifications');
     }
 
-    return token;
-  };
+    try {
+        const { status: initialStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = initialStatus;
 
-  const sendPushTokenToBackend = async (token) => {
+        if (initialStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+
+        if (finalStatus !== 'granted') {
+            console.warn('Failed to get push token for push notification!');
+            return;
+        }
+
+        const token = (await Notifications.getExpoPushTokenAsync()).data;
+        console.log('Push token:', token);
+
+        return sendPushTokenToBackend(token);
+    } catch (error) {
+        console.error('Error getting a push token', error);
+    }
+}
+
+async function sendPushTokenToBackend(token) {
     const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/save-push-token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token }),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
     });
-  
+
     if (!response.ok) {
-      console.error('Failed to send token to backend');
+        console.error('Failed to send token to backend:', response);
+    } else {
+        console.log('Token saved to backend successfully.');
     }
-  };
+}
 
   const setupNotificationListeners = () => {
     Notifications.addNotificationReceivedListener(handleNotificationReceived);

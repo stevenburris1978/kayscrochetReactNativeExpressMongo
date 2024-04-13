@@ -2,9 +2,14 @@
   "expo": {
     "name": "Kay's Crochet",
     "slug": "kayscrochet",
-    "version": "2.0.7",
+    "version": "3.0.1",
     "orientation": "default",
     "icon": "./assets/icon.png",
+    "notification": {
+      "icon": "./assets/icon.png",
+      "color": "#F8D7DA",
+      "iosDisplayInForeground": true
+    },
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -30,7 +35,7 @@
       },
       "package": "com.stevenburris1978.kayscrochet",
       "permissions": ["CAMERA", "WRITE_EXTERNAL_STORAGE"],
-      "versionCode": 9,
+      "versionCode": 10,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
