@@ -8,10 +8,18 @@ const PushToken = require('./models/pushToken');
 const cors = require('cors');
 const Expo = require('expo-server-sdk').Expo
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const rateLimit = require('express-rate-limit');
 
 require('dotenv').config();
 
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 100 
+});
+
+app.use(limiter);
 
 app.use(cors());
 
