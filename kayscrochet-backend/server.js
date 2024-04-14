@@ -9,7 +9,7 @@ const cors = require('cors');
 const Expo = require('expo-server-sdk').Expo
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const rateLimit = require('express-rate-limit');
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 require('dotenv').config();
 
