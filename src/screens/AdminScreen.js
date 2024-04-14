@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FlatList, Modal, StyleSheet, View, TextInput, TouchableOpacity, TouchableWithoutFeedback, Text, Alert, SafeAreaView } from 'react-native';
+import { FlatList, Modal, ScrollView, StyleSheet, View, TextInput, TouchableOpacity, TouchableWithoutFeedback, Text, Alert, SafeAreaView } from 'react-native';
 import AddItem from '../components/Item/AddItem';
 import Constants from "expo-constants";
 import Items from '../components/Item/Items';
@@ -54,7 +54,6 @@ const AdminScreen = () => {
         // Proceed with showing admin content
       } else {
         Alert.alert('Authentication Failed', 'You are not authorized to access this page.');
-        // Redirect to login screen or handle unauthorized access
       }
     } catch (error) {
       console.error('Error checking admin authentication:', error);
@@ -68,15 +67,16 @@ const AdminScreen = () => {
 
   return (
 <SafeAreaView style={styles.screen}>
-    <View>
+    
       <FlatList
-        ListHeaderComponent={AddItem}
+        ListHeaderComponent={<AddItem />}
+        ListHeaderComponentStyle={styles.headerComponent}
         data={itemList.filter(item => item)}
         keyExtractor={(item) => item._id.toString()}
         renderItem={({ item }) => (
           <Items
             description={item.description}
-            date={item.date}
+            date={item.date} 
             images={item.images}
             
             renderRightActions={() => (
@@ -126,7 +126,7 @@ const AdminScreen = () => {
             </TouchableOpacity>
           </View>
         </Modal>
-    </View>
+    
   </SafeAreaView>
   
   );
@@ -227,6 +227,9 @@ const styles = StyleSheet.create({
     color: "hsl(270, 50%, 60%)",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  headerComponent: {
+    paddingTop: 13,
   },
 });
 

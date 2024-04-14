@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7E7F8',
     justifyContent: 'center',
     paddingHorizontal: 10,
+    paddingBottom: 100
   },
   textadmin: {
     fontSize: 16,

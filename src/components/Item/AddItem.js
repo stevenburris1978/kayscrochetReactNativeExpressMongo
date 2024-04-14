@@ -1,14 +1,17 @@
 import React, { useState, useContext } from "react";
-import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity, Image} from "react-native";
+import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from "react-native";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import TaskContext from "../../context/TaskContext";
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function AddItem() {
-  const {addItem} = useContext(TaskContext);
+  const { addItem } = useContext(TaskContext);
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [displayDate, setDisplayDate] = useState(""); 
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false); 
 
   const CheckIcon = () => (
     <MaterialCommunityIcons name="check-circle" size={24} color="hsl(270, 50%, 60%)" style={styles.checkIcon} />
@@ -17,13 +20,12 @@ export default function AddItem() {
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to make this work!');
+      Alert.alert('Permission Denied', 'Sorry, camera roll permissions needed to make this work!');
       return false;
     }
     return true;
   };
 
-  // Function to select images
   const selectImages = async () => {
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
@@ -40,12 +42,27 @@ export default function AddItem() {
     }
   };
 
+  const uriToBase64 = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      return await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result.split(',')[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+    }
+  };
+
   const uploadImagesAndAddItem = async () => {
     let imageUrls = [];
-  
     for (const imageUri of images) {
       const base64 = await uriToBase64(imageUri);
-  
       if (base64) {
         try {
           const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/api/upload', {
@@ -68,69 +85,52 @@ export default function AddItem() {
         }
       }
     }
-  
+
+    if (!selectedDate) {
+      alert("Please select a valid date.");
+      return;
+    }
+
     const itemData = {
       description,
-      date: selectedDate,
+      date: selectedDate, 
       images: imageUrls,
     };
   
     addItem(itemData);
     setDescription("");
     setSelectedDate(null);
+    setDisplayDate("");
     setImages([]);
-  };
-  
-  // Helper function to convert URI to base64
-  const uriToBase64 = async (uri) => {
-    try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      return await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result.split(',')[1]);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error('Error converting image to base64:', error);
-    }
-  };
-  
-
-  // add item card
-  const handleSubmit = () => {
-    if (description && selectedDate) {
-      uploadImagesAndAddItem();
-    } else {
-      alert("Please enter all required info.");
-    }
-  };
-  
-  //DateTimePicker
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
   };
 
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
 
+  const handleSubmit = async () => {
+    if (!description || !selectedDate) {
+      Alert.alert("Please enter description and date.");
+      return;
+    }
+    console.log("Sending date:", selectedDate);
+    await uploadImagesAndAddItem();
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
   const handleConfirm = (date) => {
-   
+    const isoDate = date.toISOString();
     const formattedDate = date.toLocaleDateString("en-US", {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
-    setSelectedDate(formattedDate);
-    console.log("A date has been picked: ", formattedDate);
-    hideDatePicker();
+    setSelectedDate(isoDate);
+    setDisplayDate(formattedDate); 
+    setDatePickerVisibility(false);
   };
     
   return (

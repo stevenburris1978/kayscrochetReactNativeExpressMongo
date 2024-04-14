@@ -45,9 +45,9 @@ kayscrochet-backend/.env
 
 %ProgramData%/
 
-assets/icon(android).png
+assets/icon(ios).png
 
-assets/adaptive-icon(android).png
+assets/adaptive-icon(ios).png
 
 AuthKey_2W7SFTU5A5.p8/
 

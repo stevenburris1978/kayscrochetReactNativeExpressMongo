@@ -1,99 +1,112 @@
-import React, { useEffect, useState } from 'react';
-import { Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import { NavigationContainer } from '@react-navigation/native';
 import Navigation from './src/Navigation';
-import { AuthProvider } from './src/context/AuthContext'; 
+import { AuthProvider } from './src/context/AuthContext';
 import { TaskProvider } from './src/context/TaskContext';
-import * as Device from 'expo-device';
 
-// Define isPortrait for orientation
-const isPortrait = () => {
-  const dim = Dimensions.get('screen');
-  return dim.height >= dim.width;
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+async function handleRegistrationError(errorMessage) {
+  alert(errorMessage); 
+  console.error(errorMessage); 
+}
+
+async function registerForPushNotificationsAsync() {
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  if (Device.isDevice) {
+    try {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      console.log('Current permission status:', existingStatus); // Log current permissions status
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+        console.log('New permission status after request:', finalStatus); // Log updated permissions status
+      }
+      if (finalStatus !== 'granted') {
+        handleRegistrationError('Failed to get push token for push notification!');
+        return;
+      }
+
+      const token = await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig.extra.eas.projectId,
+      });
+      console.log('Push token received:', token.data); // Log the received token
+      return token.data;
+    } catch (error) {
+      console.error('Error getting a push token:', error);
+      handleRegistrationError(`Error getting a push token: ${error}`);
+    }
+  } else {
+    handleRegistrationError('Must use physical device for push notifications');
+  }
 };
 
-const App = () => {
-
-  const [orientation, setOrientation] = useState(isPortrait() ? 'portrait' : 'landscape');
-
-  const handleOrientationChange = () => {
-    setOrientation(isPortrait() ? 'portrait' : 'landscape');
-  };
-
-  async function registerForPushNotificationsAsync() {
-    if (!Device.isDevice) {
-        console.warn('Must use physical device for Push Notifications');
-        return;
-    }
-
-    try {
-        const { status: initialStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = initialStatus;
-
-        if (initialStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
-            finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
-            console.warn('Failed to get push token for push notification!');
-            return;
-        }
-
-        const token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log('Push token:', token);
-
-        return sendPushTokenToBackend(token);
-    } catch (error) {
-        console.error('Error getting a push token', error);
-    }
-}
-
 async function sendPushTokenToBackend(token) {
+  try {
     const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/save-push-token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
     });
+
+    const responseBody = await response.text(); // Retrieve response body for detailed logging
 
     if (!response.ok) {
-        console.error('Failed to send token to backend:', response);
+      console.error('Failed to send token to backend:', responseBody); // Log detailed error response
+      throw new Error(`Failed to save token: ${responseBody}`);
     } else {
-        console.log('Token saved to backend successfully.');
+      console.log('Token saved to backend successfully:', responseBody); // Log success response for confirmation
     }
+  } catch (error) {
+    console.error('Error sending push token to backend:', error);
+  }
 }
 
-  const setupNotificationListeners = () => {
-    Notifications.addNotificationReceivedListener(handleNotificationReceived);
-    Notifications.addNotificationResponseReceivedListener(handleNotificationResponse);
-  };
+const App = () => {
+  const [expoPushToken, setExpoPushToken] = useState('');
 
-  const handleNotificationReceived = notification => {
-    console.log('Notification Received:', notification);
-    // Handle notification received when app is open (foreground)
-  };
-
-  const handleNotificationResponse = response => {
-    console.log('Notification Response:', response);
-    // Handle notification response (user interaction)
-  };
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   useEffect(() => {
-
-    (async () => {
-      await registerForPushNotificationsAsync();
-      setupNotificationListeners();
-    })();
-
-    const subscription = Dimensions.addEventListener('change', () => {
-      setOrientation(isPortrait() ? 'portrait' : 'landscape');
+    registerForPushNotificationsAsync().then(token => {
+      setExpoPushToken(token);
+      sendPushTokenToBackend(token); 
     });
 
-    return () => subscription?.remove();
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log(notification);
+    });
 
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
 
   return (

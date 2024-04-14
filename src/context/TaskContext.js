@@ -69,9 +69,9 @@ export const TaskProvider = ({ children }) => {
                 method: 'DELETE',
               });
               if (response.ok) {
-                fetchItems(); // Refresh the list after deletion
+                fetchItems(); 
               } else {
-                // Handle errors
+                
                 console.error('Error deleting item:', await response.json());
               }
             } catch (error) {

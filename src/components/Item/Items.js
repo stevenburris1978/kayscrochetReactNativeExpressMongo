@@ -12,14 +12,24 @@ export default function Items({
 }) {
 
   const formatDate = (dateString) => {
-    const dateObj = new Date(dateString);
-    dateObj.setDate(dateObj.getDate() + 1);
-    return dateObj.toLocaleDateString("en-US", {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    try {
+
+      const dateObj = new Date(dateString);
+      if (!isNaN(dateObj.getTime())) {
+        return dateObj.toLocaleDateString("en-US", {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+      } else {
+        return "Invalid Date";
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Error in date";
+    }
   };
+  
 
   const renderImages = () => {
     return images?.map((img, index) => {

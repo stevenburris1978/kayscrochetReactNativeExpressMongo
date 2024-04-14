@@ -2,7 +2,7 @@
   "expo": {
     "name": "Kay's Crochet",
     "slug": "kayscrochet",
-    "version": "3.0.1",
+    "version": "3.0.5",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "notification": {
@@ -35,7 +35,7 @@
       },
       "package": "com.stevenburris1978.kayscrochet",
       "permissions": ["CAMERA", "WRITE_EXTERNAL_STORAGE"],
-      "versionCode": 10,
+      "versionCode": 14,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
