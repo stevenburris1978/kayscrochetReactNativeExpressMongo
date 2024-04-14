@@ -9,6 +9,7 @@ const cors = require('cors');
 const Expo = require('expo-server-sdk').Expo
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const rateLimit = require('express-rate-limit');
+const { body, validationResult } = require('express-validator');
 
 require('dotenv').config();
 
@@ -148,22 +149,27 @@ app.use((err, req, res, next) => {
     res.status(500).send('An error occurred');
 });
 
-app.post('/admin/login', async (req, res) => {
-    const { username, password } = req.body;
-    const admin = await Admin.findOne({ username });
-
-    if (!admin) {
-        return res.status(401).send('Admin not found');
-    }
-
-    if (!await bcrypt.compare(password, admin.password)) {
-        return res.status(401).send('Invalid password');
-    }
-
-    // Create a token
-    const token = jwt.sign({ username: admin.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+app.post('/admin/login', [
+  body('username').trim().escape(),
+  body('password')
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  
+  const { username, password } = req.body;
+  const admin = await Admin.findOne({ username });
+  if (!admin) {
+    return res.status(401).send('Admin not found');
+  }
+  if (!await bcrypt.compare(password, admin.password)) {
+    return res.status(401).send('Invalid password');
+  }
+  const token = jwt.sign({ username: admin.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  res.json({ token });
 });
+
 
 app.get('/admin/check-auth', verifyToken, (req, res) => {
     res.json({ success: true, message: "Authenticated" });
@@ -207,16 +213,25 @@ app.get('/items', async (req, res) => {
   });
   
 // POST a new item
-app.post('/items', async (req, res) => {
+app.post('/items', [
+  body('description').trim().escape(),
+  body('date').isISO8601().toDate(),
+  body('images').isArray(),
+  body('images.*').isURL()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const newItem = new Item({
     description: req.body.description,
     date: req.body.date,
-    images: req.body.images,
+    images: req.body.images
   });
 
   try {
     const savedItem = await newItem.save();
-    sendPushNotification(savedItem); 
     res.status(201).json(savedItem);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -224,7 +239,14 @@ app.post('/items', async (req, res) => {
 });
 
 // DELETE an item
-app.delete('/items/:id', async (req, res) => {
+app.delete('/items/:id', [
+  param('id').isMongoId(),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const item = await Item.findByIdAndDelete(req.params.id);
     if (!item) {
@@ -236,10 +258,15 @@ app.delete('/items/:id', async (req, res) => {
   }
 });
 
-// Route for saving push tokens
-app.post('/save-push-token', async (req, res) => {
-  const { token } = req.body;
+app.post('/save-push-token', [
+  body('token').isString().notEmpty().trim(),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
+  const { token } = req.body;
   try {
     let pushToken = await PushToken.findOne({ token });
     if (!pushToken) {
@@ -254,13 +281,21 @@ app.post('/save-push-token', async (req, res) => {
 });
 
 // update an item
-app.put('/items/:id', async (req, res) => {
+app.put('/items/:id', [
+  param('id').isMongoId().withMessage('Invalid item ID'), 
+  body('description').trim().escape()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const item = await Item.findById(req.params.id);
-    if (!item) 
-    return res.status(404).json({ message: 'Item not found' });
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' }); 
+    }
 
-    // Update fields
     item.description = req.body.description || item.description;
 
     const updatedItem = await item.save();
