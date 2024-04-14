@@ -232,6 +232,7 @@ app.post('/items', [
 
   try {
     const savedItem = await newItem.save();
+    sendPushNotification(savedItem);
     res.status(201).json(savedItem);
   } catch (error) {
     res.status(400).json({ message: error.message });
