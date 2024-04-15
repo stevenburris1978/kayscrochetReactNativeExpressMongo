@@ -8,7 +8,8 @@ const AdminLoginScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   
   const { signIn } = useContext(AuthContext);
-
+  
+  // log into the Admin Notifications screen
   const handleLogin = async () => {
     try {
       const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/admin/login', {

@@ -21,6 +21,7 @@ async function handleRegistrationError(errorMessage) {
   console.error(errorMessage); 
 }
 
+// registers for Expo push tokens on iOS and Android devices
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
@@ -60,6 +61,7 @@ async function registerForPushNotificationsAsync() {
   }
 };
 
+// sends Expo push token to Mongodb through Express server on Heroku
 async function sendPushTokenToBackend(token) {
   try {
     const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/save-push-token', {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 
+// Add a tap timer for the Admin to log in 
 const CustomDrawerContent = (props) => {
   const [tapCount, setTapCount] = useState(0);
   let tapTimer = null;

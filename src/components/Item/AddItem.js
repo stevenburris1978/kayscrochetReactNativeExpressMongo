@@ -137,12 +137,12 @@ export default function AddItem() {
     <>
       <SafeAreaView style={styles.screen}>
         <View style={styles.viewContainer}>
-          <Text style={styles.title}>Add Items</Text>
+          <Text style={styles.title}>Admin Notifications</Text>
           
           <View style={styles.inputRow}>
             <TextInput
               style={styles.input}
-              placeholder="Enter Item Description"
+              placeholder="Enter New Item Description"
               onChangeText={(description) => setDescription(description)}
               value={description}
               multiline={true} 
@@ -173,7 +173,7 @@ export default function AddItem() {
           />
 
           <TouchableOpacity style={styles.buttonTwo} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Add Item</Text>
+            <Text style={styles.buttonText}>Send</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

@@ -3,7 +3,8 @@ import { ScrollView, StatusBar, Text, TouchableOpacity, View, StyleSheet, Linkin
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 const ContactScreen = () => {
-    // Function to handle email link press
+    
+    // opens iOS and Android default email app to email kayscrochetus@gmail.com
     const handleEmailPress = () => {
         Linking.openURL('mailto:kayscrochetus@gmail.com');
     };

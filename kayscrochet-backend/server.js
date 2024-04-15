@@ -11,12 +11,14 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const rateLimit = require('express-rate-limit');
 const { body, param, validationResult } = require('express-validator');
 
+// for environment variable secrets
 require('dotenv').config();
 
 const app = express();
 
 app.set('trust proxy', 1);
 
+// security
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
   max: 100 
@@ -32,7 +34,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
+// security
 app.use(helmet({
   contentSecurityPolicy: {
       directives: {
@@ -51,6 +53,7 @@ app.use(helmet({
   }
 }));
 
+// Send push notifications to iOS and Android Devices for New Items Added
 const sendPushNotification = async (itemData) => {
   try {
     const tokens = await PushToken.find({});
@@ -90,7 +93,7 @@ const adminSchema = new mongoose.Schema({
 
 const Admin = mongoose.model('Admin', adminSchema);
 
-// JWT verification middleware
+// JWT user verification middleware
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -168,13 +171,12 @@ app.get('/admin/check-auth', verifyToken, (req, res) => {
     res.json({ success: true, message: "Authenticated" });
 });
 
-// Route to handle image upload
+// Route to handle image upload with AWS s3
 app.post('/api/upload', async (req, res) => {
   try {
     const base64Data = Buffer.from(req.body.image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
     const imageKey = `${Date.now()}.jpg`;
 
-    // AWS SDK v3 upload parameters
     const params = {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: imageKey,
@@ -252,6 +254,7 @@ app.delete('/items/:id', [
   }
 });
 
+// Saves expo push tokens for iOS and Android devices
 app.post('/save-push-token', [
   body('token').isString().notEmpty().trim(),
 ], async (req, res) => {
@@ -274,7 +277,7 @@ app.post('/save-push-token', [
   }
 });
 
-// update an item
+// update an item description
 app.put('/items/:id', [
   param('id').isMongoId().withMessage('Invalid item ID'), 
   body('description').trim().escape()
@@ -299,6 +302,7 @@ app.put('/items/:id', [
   }
 });
 
+// update an item description
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

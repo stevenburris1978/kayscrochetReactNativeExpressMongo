@@ -5,6 +5,8 @@ import Items from '../components/Item/Items';
 import TaskContext from "../context/TaskContext";
 
 function NotificationsScreen() {
+
+  // shows recent notifications
   const { itemList } = useContext(TaskContext);
 
   return (

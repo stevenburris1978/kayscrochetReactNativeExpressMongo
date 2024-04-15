@@ -2,6 +2,7 @@ import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
+// webview to show Kay's Crochet website in the app Home Screen
 const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>

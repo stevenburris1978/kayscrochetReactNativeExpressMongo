@@ -21,11 +21,13 @@ const AdminScreen = () => {
     setModalVisible(true);
     editItem(item);
   };
-
+  
+  // make the edit description modal open
   const handleAdminPress = () => {
     setModalVisible(false);
   };
-
+  
+  // finish update an item description
   const handleUpdateItem = async () => {
     if (itemId) {
       try {
@@ -39,7 +41,7 @@ const AdminScreen = () => {
     }
   };
 
-  // Function to check if the admin is authenticated
+  // check if the admin is authenticated and show Admin notifications screen
   const checkAdminAuth = async () => {
     try {
       const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/admin/check-auth', {
@@ -51,7 +53,7 @@ const AdminScreen = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data.message); 
-        // Proceed with showing admin content
+        
       } else {
         Alert.alert('Authentication Failed', 'You are not authorized to access this page.');
       }
@@ -65,6 +67,7 @@ const AdminScreen = () => {
     checkAdminAuth();
   }, []);
 
+  // below is the view to show the admin add item component and the item's list in one FlatList component
   return (
 <SafeAreaView style={styles.screen}>
     

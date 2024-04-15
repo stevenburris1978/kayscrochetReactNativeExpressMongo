@@ -3,11 +3,12 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
+// Add A notifications screen link on the home screen navigator header
 const CustomHeader = () => {
   const navigation = useNavigation();
 
   const handleNotificationsPress = () => {
-    // Navigate to the Notifications screen when notifications icon is pressed
+    
     navigation.navigate('Notifications');
   };
 

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
+// Add a link in the draswer navigator header to go back to home screen
 const CustomScreenHeader = ({ title, showBack }) => {
   const navigation = useNavigation();
 

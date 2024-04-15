@@ -7,28 +7,27 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+ 
+  // save token for use with hashed password for user sign in
   const signIn = async (token) => {
     try {
-      await AsyncStorage.setItem('userToken', token); // Saving token to local storage
+      await AsyncStorage.setItem('userToken', token);
       setUserToken(token);
       setIsAuthenticated(true);
-      // Additional logic for handling successful sign in (if needed)
     } catch (error) {
       console.error('Error during sign-in:', error);
-      // Handle errors (like showing an alert or a message to the user)
     }
   };
 
   const signOut = async () => {
     try {
-      await AsyncStorage.removeItem('userToken'); // Removing token from local storage
+      await AsyncStorage.removeItem('userToken'); 
       setUserToken(null);
       setIsAuthenticated(false);
-      // Additional logic for handling sign out (if needed)
+      
     } catch (error) {
       console.error('Error during sign-out:', error);
-      // Handle errors (like showing an alert or a message to the user)
+      
     }
   };
 

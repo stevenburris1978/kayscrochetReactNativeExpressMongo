@@ -38,10 +38,15 @@ kayscrochet-backend/.expo
 
 kayscrochet-backend/createAdmin.js
 
+kayscrochet-backend/config
+
 kayscrochet-backend/.env
 
 .idea/
 
 %ProgramData%/
 
-google-services.json
+assets/icon(ios).png
+
+assets/adaptive-icon(ios).png
+

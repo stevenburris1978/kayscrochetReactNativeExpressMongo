@@ -18,7 +18,6 @@ export const TaskProvider = ({ children }) => {
       if (response.ok) {
         setItemList(data);
       } else {
-        // Handle errors
         console.error('Error fetching items:', data);
       }
     } catch (error) {
@@ -30,7 +29,7 @@ export const TaskProvider = ({ children }) => {
     fetchItems();
   }, []);
 
-  // Add Item
+  // Add New Item
   const addItem = async (newItem) => {
     try {
       const response = await fetch('https://kayscrochetmobileapp-5c1e1888702b.herokuapp.com/items', {

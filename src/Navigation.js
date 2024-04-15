@@ -16,6 +16,7 @@ import CustomScreenHeader from './components/CustomScreenHeader';
 
 import { useAuth } from './context/AuthContext';
 
+// this is for the drawer navigation of each screen
 const Drawer = createDrawerNavigator();
 
 const Navigation = () => {
