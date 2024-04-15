@@ -15,14 +15,18 @@
 ### Admin can send push notifications to iOS and Android devices with the new item's description while adding the notification with images of the new items to the app Notifications Screen.
 ### Android and iOS users can see Kay's Crochet webview to buy Kay's crocheted items, receive iOS and Android push notifications, and view the Contact, Policy, and Notifications screens of the drawer menu navigator.
 
-# *Kay's Crochet mobile app install instructions*
-### Install Kay's Crochet mobile app by searching for Kay's Crochet in the iOS App Store and Android App Store.
+# *Kay's Crochet mobile app install and setup instructions*
+## Install Kay's Crochet mobile app by searching for Kay's Crochet in the iOS App Store and Android App Store.
+## *Kay's Crochet opens with the Expo Go app*
 
-# *Kay's Crochet open with the Expo Go app*
-### To use Expo Go these environment variables to to be set up in the Express server through Heroku with Mongodb database.
+### These environment variables to to be set up in the Express server through Heroku with Mongodb database.
 MONGODB_URI=
 JWT_SECRET=
 AWS_SECRET_ACCESS_KEY=
 AWS_ACCESS_KEY_ID=
 S3_BUCKET_NAME=
 FIREBASE_SERVICE_ACCOUNT_PATH=
+
+## *Kay's Crochet files needed*
+### Kay's Crochet needs the google-services.json file from Firebase Cloud Messaging for Android devices and iOS devices need the APNs key for expo push notifications to work.
+### Kay's crochet needs a createAdmin.js file set up to manually set the admin usernames and hashed passwords into the Mongodb database.
