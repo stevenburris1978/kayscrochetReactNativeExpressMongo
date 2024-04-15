@@ -46,7 +46,4 @@ kayscrochet-backend/.env
 
 %ProgramData%/
 
-assets/icon(ios).png
-
-assets/adaptive-icon(ios).png
-
+google-services.json
