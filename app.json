@@ -2,7 +2,7 @@
   "expo": {
     "name": "Kay's Crochet",
     "slug": "kayscrochet",
-    "version": "3.0.5",
+    "version": "3.1.1",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "notification": {
@@ -25,8 +25,8 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to upload images.",
         "NSCameraUsageDescription": "This app requires access to the camera to take photos."
-      },
-      "googleServicesFile": "./GoogleService-Info.plist"
+      }
+      
     },
     "android": {
       "adaptiveIcon": {
@@ -35,24 +35,13 @@
       },
       "package": "com.stevenburris1978.kayscrochet",
       "permissions": ["CAMERA", "WRITE_EXTERNAL_STORAGE"],
-      "versionCode": 14,
+      "versionCode": 16,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/icon.png"
     },
-    "plugins": [
-      "@react-native-firebase/app",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ],
-      "./plugins/withPodsCustomizations" 
-    ],
+
     "extra": {
       "eas": {
         "projectId": "30cd4006-9bc8-403d-a7d6-bbfef44d5ea1"

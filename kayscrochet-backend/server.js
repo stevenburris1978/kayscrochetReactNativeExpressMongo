@@ -51,13 +51,6 @@ app.use(helmet({
   }
 }));
 
-const admin = require('firebase-admin');
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-
 const sendPushNotification = async (itemData) => {
   try {
     const tokens = await PushToken.find({});

@@ -34,12 +34,12 @@ async function registerForPushNotificationsAsync() {
   if (Device.isDevice) {
     try {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      console.log('Current permission status:', existingStatus); // Log current permissions status
+      console.log('Current permission status:', existingStatus); 
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
-        console.log('New permission status after request:', finalStatus); // Log updated permissions status
+        console.log('New permission status after request:', finalStatus); 
       }
       if (finalStatus !== 'granted') {
         handleRegistrationError('Failed to get push token for push notification!');
@@ -49,7 +49,7 @@ async function registerForPushNotificationsAsync() {
       const token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig.extra.eas.projectId,
       });
-      console.log('Push token received:', token.data); // Log the received token
+      console.log('Push token received:', token.data); 
       return token.data;
     } catch (error) {
       console.error('Error getting a push token:', error);
@@ -70,13 +70,13 @@ async function sendPushTokenToBackend(token) {
       body: JSON.stringify({ token }),
     });
 
-    const responseBody = await response.text(); // Retrieve response body for detailed logging
+    const responseBody = await response.text(); 
 
     if (!response.ok) {
-      console.error('Failed to send token to backend:', responseBody); // Log detailed error response
+      console.error('Failed to send token to backend:', responseBody); 
       throw new Error(`Failed to save token: ${responseBody}`);
     } else {
-      console.log('Token saved to backend successfully:', responseBody); // Log success response for confirmation
+      console.log('Token saved to backend successfully:', responseBody);
     }
   } catch (error) {
     console.error('Error sending push token to backend:', error);
