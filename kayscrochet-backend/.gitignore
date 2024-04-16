@@ -11,4 +11,3 @@ node_modules/
 data/
 
 #admin user hash creator file
-createAdmin.js
