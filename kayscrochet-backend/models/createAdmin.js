@@ -25,6 +25,7 @@ async function createAdminUser(username, password) {
     console.log(`Admin user ${username} created`);
 }
 
+// replace with actual usernames and passwords
 createAdminUser('user1', 'password1').then(() => {
     createAdminUser('user2', 'password2').then(() => {
         mongoose.connection.close();
