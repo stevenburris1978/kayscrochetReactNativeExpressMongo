@@ -25,8 +25,8 @@ async function createAdminUser(username, password) {
     console.log(`Admin user ${username} created`);
 }
 
-createAdminUser('kay', 'Password1018!').then(() => {
-    createAdminUser('temporary', 'Kaystempus3r!').then(() => {
+createAdminUser('user1', 'password1').then(() => {
+    createAdminUser('user2', 'password2').then(() => {
         mongoose.connection.close();
     });
 });
