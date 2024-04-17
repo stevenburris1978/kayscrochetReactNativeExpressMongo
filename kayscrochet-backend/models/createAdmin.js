@@ -4,6 +4,7 @@ require('dotenv').config();
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
+// send this createAdmin.js hash password to Mongodb by going to function’s directory and in terminal    node createAdmin.js
 const adminSchema = new mongoose.Schema({
     username: String,
     password: String
@@ -24,8 +25,8 @@ async function createAdminUser(username, password) {
     console.log(`Admin user ${username} created`);
 }
 
-createAdminUser('user1', 'password1').then(() => {
-    createAdminUser('user2', 'password2').then(() => {
+createAdminUser('kay', 'Password1018!').then(() => {
+    createAdminUser('temporary', 'Kaystempus3r!').then(() => {
         mongoose.connection.close();
     });
 });
