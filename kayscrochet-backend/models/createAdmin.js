@@ -4,7 +4,7 @@ require('dotenv').config();
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-// send this createAdmin.js hash password to Mongodb by going to function’s directory and in terminal    node createAdmin.js
+// send this createAdmin.js hash password to Mongodb by going to file path and    node createAdmin.js
 const adminSchema = new mongoose.Schema({
     username: String,
     password: String

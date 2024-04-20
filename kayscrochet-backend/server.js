@@ -1,4 +1,5 @@
 const express = require('express');
+const connectDB = require('./config/dbConfig');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -10,31 +11,24 @@ const Expo = require('expo-server-sdk').Expo
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const rateLimit = require('express-rate-limit');
 const { body, param, validationResult } = require('express-validator');
+const { limiter, corsOptions } = require('./config/corsOptions.js');
+const PORT = process.env.PORT;
 
-// for environment variable secrets
+// for environment variables
 require('dotenv').config();
 
 const app = express();
 
 app.set('trust proxy', 1);
 
+// Connecting to MongoDb Database
+connectDB();
+
 // security
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100 
-});
-
 app.use(limiter);
-
-const corsOptions = {
-  origin: true,  
-  credentials: true, 
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE'
-};
 
 app.use(cors(corsOptions));
 
-// security
 app.use(helmet({
   contentSecurityPolicy: {
       directives: {
@@ -78,12 +72,6 @@ const sendPushNotification = async (itemData) => {
     console.error('Error sending push notifications:', error);
   }
 };
-
-// Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connection successful'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
 
 // Admin Schema
 const adminSchema = new mongoose.Schema({
@@ -302,8 +290,10 @@ app.put('/items/:id', [
   }
 });
 
-// update an item description
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+// mongodb server port to use after connect
+mongoose.connection.once("open", () => {
+  console.log("Connected to MongoDB");
+  app.listen(PORT, () => {
+    console.log(`Server is listing on port ${PORT}`);
+  });
 });
