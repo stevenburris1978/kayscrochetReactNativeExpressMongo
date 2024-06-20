@@ -1,14 +1,12 @@
-## INF6653GVA - Back-end Development I
 # Steven Burris
-# 4/20/2024
-# *Final Project - Kay's Crochet React Native Expo iOS and Android App*
+# *Kay's Crochet React Native Expo iOS and Android App with Python Webview*
 # *Kay's Crochet app uses Express server with Heroku and Mongodb database for the backend, Bcrypt to hash the admin passwords, and Expo push notifications*
 
 # Github url: 
 [Gituhb](https://github.com/stevenburris1978/kayscrochetReactNativeExpressMongo)
 ### This code can be deployed locally with Expo Go or through iOS App Stores and Google Play Stores
 
-# Domain url for Home Screen's webview of my Python XAMPP Heroku PWA (progressive web app)
+# Domain url for Home Screen's webview of my Python Heroku PWA (progressive web app)
 [Kayscrochet](https://www.kayscrochet.us)
 
 # *With this app Users can login or register in the app's webview of the website; and admin can send Expo push notifications to iOS and Android devices*
