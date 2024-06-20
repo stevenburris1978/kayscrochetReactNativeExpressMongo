@@ -31,7 +31,7 @@ AWS_ACCESS_KEY_ID=
 S3_BUCKET_NAME=
 FIREBASE_SERVICE_ACCOUNT_PATH=
 
-### Variables - they need to be in a .env root directory with your keys and passwords for local development to work
+### Python Webview Variables - they need to be in a .env root directory
 DJANGO_SECRET_KEY=
 AWS_AKEY=
 AWS_SECRET_ACCESS_KEY=
